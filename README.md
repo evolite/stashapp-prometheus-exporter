@@ -14,7 +14,7 @@ Queries your Stash instance and exposes metrics like total scenes, images, perfo
 podman run --rm -p 9100:9100 \
   -e STASH_GRAPHQL_URL="http://stash:9999/graphql" \
   -e STASH_API_KEY="your_api_key" \
-  ghcr.io/evolite/stashapp-exporter:latest
+  ghcr.io/evolite/stashapp-prometheus-exporter:latest
 ```
 
 ### Local
@@ -42,7 +42,7 @@ See `dashboards/stashapp-overview.json` for a Grafana dashboard example.
 ## Building
 
 ```bash
-podman build -t stashapp-exporter:local .
+podman build -t stashapp-prometheus-exporter:local .
 ```
 
 Images are automatically built and pushed to GHCR on pushes to `main` and version tags.
