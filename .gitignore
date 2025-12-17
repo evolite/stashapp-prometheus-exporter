@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+.idea/
+.vscode/
+
+# Cursor / editor metadata not needed in GitHub
+.cursor/
+.cursorignore
+
+
