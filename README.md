@@ -46,3 +46,4 @@ podman build -t stashapp-prometheus-exporter:local .
 ```
 
 Images are automatically built and pushed to GHCR on pushes to `main` and version tags.
+
