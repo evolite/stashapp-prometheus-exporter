@@ -10,7 +10,7 @@ services:
       - ./stash-data:/root/.stash
 
   stash-exporter:
-    image: ghcr.io/${GITHUB_OWNER:-example}/stashapp-exporter:latest
+    image: ghcr.io/${GITHUB_OWNER:-example}/stashapp-prometheus-exporter:latest
     container_name: stash-exporter
     environment:
       STASH_GRAPHQL_URL: http://stash:9999/graphql
