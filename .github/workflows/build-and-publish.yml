@@ -27,16 +27,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Prepare tags
-        id: prepare_tags
+      - name: Set up tags
+        id: tags
         run: |
-          TAGS="ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:latest"
-          TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:${{ github.sha }}"
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/}"
-            TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:$VERSION"
+          echo "ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:latest" >> tags.txt
+          echo "ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:${{ github.sha }}" >> tags.txt
+          if [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            echo "ghcr.io/${{ github.repository_owner }}/stashapp-prometheus-exporter:${GITHUB_REF#refs/tags/}" >> tags.txt
           fi
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          {
+            echo "tags<<EOF"
+            cat tags.txt
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
       
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -44,5 +47,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.prepare_tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64,linux/arm64
