@@ -17,15 +17,6 @@ podman run --rm -p 9100:9100 \
   ghcr.io/evolite/stashapp-prometheus-exporter:latest
 ```
 
-### Local
-
-```bash
-pip install -r requirements.txt
-export STASH_GRAPHQL_URL="http://localhost:9999/graphql"
-export STASH_API_KEY="your_api_key"
-python -m src.main
-```
-
 ## Configuration
 
 - `STASH_GRAPHQL_URL` - Stash GraphQL endpoint (default: `http://stash:9999/graphql`)
@@ -39,11 +30,7 @@ Main metrics: `stash_scenes_total`, `stash_images_total`, `stash_performers_tota
 
 See `dashboards/stashapp-overview.json` for a Grafana dashboard example.
 
-## Building
-
-```bash
-podman build -t stashapp-prometheus-exporter:local .
-```
+![Dashboard Example](docs/dashboard.png)
 
 Images are automatically built and pushed to GHCR on pushes to `main` and version tags.
 
