@@ -2,7 +2,8 @@
 Prometheus metric definitions and update helpers for the Stash exporter.
 
 Metrics are intentionally low‑cardinality gauges that expose library‑wide
-aggregates derived from the Stash GraphQL `stats` query.
+aggregates derived from the Stash GraphQL `stats` query and a small set of
+Scene fields.
 
 All metric names follow Prometheus best practices described in:
 https://prometheus.io/docs/practices/naming/
@@ -85,6 +86,47 @@ stash_total_play_count = Gauge(
 stash_scenes_played_total = Gauge(
     "stash_scenes_played_total",
     "Total number of scenes that have at least one recorded play.",
+)
+
+# Coverage / curation metrics derived from Scene fields
+stash_scenes_organized_total = Gauge(
+    "stash_scenes_organized_total",
+    "Total number of scenes marked as organized.",
+)
+
+stash_scenes_with_stashid_total = Gauge(
+    "stash_scenes_with_stashid_total",
+    "Total number of scenes that have at least one StashID entry.",
+)
+
+stash_scenes_tagged_total = Gauge(
+    "stash_scenes_tagged_total",
+    "Total number of scenes that have at least one tag.",
+)
+
+stash_scenes_with_performers_total = Gauge(
+    "stash_scenes_with_performers_total",
+    "Total number of scenes that have at least one performer.",
+)
+
+stash_scenes_with_studio_total = Gauge(
+    "stash_scenes_with_studio_total",
+    "Total number of scenes that have an associated studio.",
+)
+
+stash_scenes_watched_total = Gauge(
+    "stash_scenes_watched_total",
+    "Total number of scenes that have at least one play.",
+)
+
+stash_scenes_with_markers_total = Gauge(
+    "stash_scenes_with_markers_total",
+    "Total number of scenes that have at least one scene marker.",
+)
+
+stash_scene_markers_total = Gauge(
+    "stash_scene_markers_total",
+    "Total number of scene markers across all scenes.",
 )
 
 # Exporter health metric relative to Stash
@@ -217,6 +259,61 @@ def update_playtime_buckets_from_scenes(scenes: Iterable[Dict[str, Any]]) -> Non
         stash_play_duration_seconds_by_hour.labels(hour_of_day=hour_key).set(total_seconds)
 
 
+def update_metadata_from_scenes(scenes: Iterable[Dict[str, Any]]) -> None:
+    """Update metadata/coverage metrics from a list of Scene objects."""
+
+    organized = 0
+    with_stashid = 0
+    tagged = 0
+    with_performers = 0
+    with_studio = 0
+    watched = 0
+    with_markers = 0
+    marker_total = 0
+
+    for scene in scenes:
+        if scene.get("organized"):
+            organized += 1
+
+        stash_ids = scene.get("stash_ids") or []
+        if stash_ids:
+            with_stashid += 1
+
+        tags = scene.get("tags") or []
+        if tags:
+            tagged += 1
+
+        performers = scene.get("performers") or []
+        if performers:
+            with_performers += 1
+
+        studio = scene.get("studio")
+        if studio is not None:
+            with_studio += 1
+
+        play_count = _safe_int(scene.get("play_count"))
+        if play_count > 0:
+            watched += 1
+
+        markers = scene.get("scene_markers") or []
+        if markers:
+            with_markers += 1
+            try:
+                marker_total += len(markers)
+            except TypeError:
+                # In case markers is not a simple list, fall back to one per entry
+                marker_total += sum(1 for _ in markers)
+
+    stash_scenes_organized_total.set(float(organized))
+    stash_scenes_with_stashid_total.set(float(with_stashid))
+    stash_scenes_tagged_total.set(float(tagged))
+    stash_scenes_with_performers_total.set(float(with_performers))
+    stash_scenes_with_studio_total.set(float(with_studio))
+    stash_scenes_watched_total.set(float(watched))
+    stash_scenes_with_markers_total.set(float(with_markers))
+    stash_scene_markers_total.set(float(marker_total))
+
+
 __all__ = [
     "stash_scenes_total",
     "stash_images_total",
@@ -232,11 +329,19 @@ __all__ = [
     "stash_total_play_duration_seconds",
     "stash_total_play_count",
     "stash_scenes_played_total",
+    "stash_scenes_organized_total",
+    "stash_scenes_with_stashid_total",
+    "stash_scenes_tagged_total",
+    "stash_scenes_with_performers_total",
+    "stash_scenes_with_studio_total",
+    "stash_scenes_watched_total",
+    "stash_scenes_with_markers_total",
+    "stash_scene_markers_total",
     "stash_play_duration_seconds_by_dow",
     "stash_play_duration_seconds_by_hour",
     "stash_up",
     "update_metrics_from_stats",
     "update_playtime_buckets_from_scenes",
+    "update_metadata_from_scenes",
 ]
-
 

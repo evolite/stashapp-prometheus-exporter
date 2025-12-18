@@ -16,7 +16,12 @@ from typing import Any, Dict
 from prometheus_client import start_http_server
 
 from .config import Config, configure_logging, load_config
-from .metrics import stash_up, update_metrics_from_stats, update_playtime_buckets_from_scenes
+from .metrics import (
+    stash_up,
+    update_metadata_from_scenes,
+    update_metrics_from_stats,
+    update_playtime_buckets_from_scenes,
+)
 from .queries import LIBRARY_STATS_QUERY, SCENE_PLAY_HISTORY_QUERY
 from .stash_client import StashClient, StashClientError
 
@@ -48,11 +53,12 @@ def _scrape_once(client: StashClient) -> None:
         stats = data.get("stats") or {}
         update_metrics_from_stats(stats)
 
-        # Derive playtime buckets from scene play history.
+        # Derive playtime buckets and metadata coverage from scene data.
         scenes_data: Dict[str, Any] = client.run_query(SCENE_PLAY_HISTORY_QUERY)
         scenes_root = scenes_data.get("findScenes") or {}
         scenes = scenes_root.get("scenes") or []
         update_playtime_buckets_from_scenes(scenes)
+        update_metadata_from_scenes(scenes)
 
         stash_up.set(1.0)
     except StashClientError as exc:
@@ -114,5 +120,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
 

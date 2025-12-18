@@ -35,10 +35,20 @@ query LibraryStats {
 """
 
 
+# This query powers both the playtime buckets and the metadata/coverage
+# metrics. It intentionally fetches only the fields needed for aggregate
+# calculations inside the exporter.
 SCENE_PLAY_HISTORY_QUERY: str = """
 query ScenePlayHistory {
   findScenes(filter: { per_page: -1 }) {
     scenes {
+      organized
+      stash_ids { endpoint stash_id }
+      tags { id }
+      performers { id }
+      studio { id }
+      scene_markers { id }
+
       play_count
       play_duration
       play_history
@@ -49,5 +59,4 @@ query ScenePlayHistory {
 
 
 __all__ = ["LIBRARY_STATS_QUERY", "SCENE_PLAY_HISTORY_QUERY"]
-
 
