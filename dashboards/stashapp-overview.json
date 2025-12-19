@@ -414,7 +414,7 @@
           "refId": "A"
         }
       ],
-      "title": "Daily Play Duration",
+      "title": "Daily Play Activity",
       "type": "timeseries"
     },
     {
@@ -1476,5 +1476,5 @@
   "timezone": "browser",
   "title": "StashApp Library & Playback Overview",
   "uid": "stashapp-overview",
-  "version": 43
+  "version": 44
 }
