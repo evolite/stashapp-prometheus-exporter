@@ -28,6 +28,8 @@ For a complete stack example with Stash, Prometheus, and Grafana, see `podman-co
 - `STASH_API_KEY` - Your Stash API key (required)
 - `SCRAPE_INTERVAL_SECONDS` - How often to query Stash (default: `30`)
 - `EXPORTER_LISTEN_PORT` - Metrics port (default: `9100`)
+- `SCENE_PAGE_SIZE` - Number of scenes per page for pagination (default: `1000`, set to `-1` to disable pagination)
+- `SCENE_MAX_SCENES` - Maximum total scenes to process (default: `-1` for unlimited, useful for sampling large libraries)
 
 ## Metrics
 ### Library statistics

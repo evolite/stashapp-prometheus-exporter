@@ -57,6 +57,32 @@ query ScenePlayHistory {
 }
 """
 
+# Paginated version of the scene query for large libraries.
+# Use GraphQL variables to control pagination: $page and $per_page.
+SCENE_PLAY_HISTORY_PAGINATED_QUERY: str = """
+query ScenePlayHistoryPaginated($page: Int!, $per_page: Int!) {
+  findScenes(filter: { page: $page, per_page: $per_page }) {
+    count
+    scenes {
+      organized
+      stash_ids { endpoint stash_id }
+      tags { id }
+      performers { id }
+      studio { id }
+      scene_markers { id }
 
-__all__ = ["LIBRARY_STATS_QUERY", "SCENE_PLAY_HISTORY_QUERY"]
+      play_count
+      play_duration
+      play_history
+    }
+  }
+}
+"""
+
+
+__all__ = [
+    "LIBRARY_STATS_QUERY",
+    "SCENE_PLAY_HISTORY_QUERY",
+    "SCENE_PLAY_HISTORY_PAGINATED_QUERY",
+]
 
