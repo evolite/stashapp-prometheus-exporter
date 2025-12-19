@@ -22,7 +22,11 @@ from .metrics import (
     update_metrics_from_stats,
     update_playtime_buckets_from_scenes,
 )
-from .queries import LIBRARY_STATS_QUERY, SCENE_PLAY_HISTORY_QUERY
+from .queries import (
+    LIBRARY_STATS_QUERY,
+    SCENE_PLAY_HISTORY_QUERY,
+    SCENE_PLAY_HISTORY_PAGINATED_QUERY,
+)
 from .stash_client import StashClient, StashClientError
 
 
@@ -45,7 +49,82 @@ def _install_signal_handlers() -> None:
             continue
 
 
-def _scrape_once(client: StashClient) -> None:
+def _fetch_scenes_paginated(
+    client: StashClient, page_size: int, max_scenes: int
+) -> list[Dict[str, Any]]:
+    """
+    Fetch scenes using pagination to handle large libraries efficiently.
+
+    Args:
+        client: StashClient instance
+        page_size: Number of scenes per page (-1 to disable pagination)
+        max_scenes: Maximum scenes to fetch (-1 for all scenes)
+
+    Returns:
+        List of scene dictionaries
+    """
+    # Use non-paginated query if page_size is -1
+    if page_size == -1:
+        LOG.debug("Using non-paginated scene query")
+        scenes_data: Dict[str, Any] = client.run_query(SCENE_PLAY_HISTORY_QUERY)
+        scenes_root = scenes_data.get("findScenes") or {}
+        scenes = scenes_root.get("scenes") or []
+        if max_scenes > 0:
+            LOG.info("Limiting scenes to %d (out of %d total)", max_scenes, len(scenes))
+            return scenes[:max_scenes]
+        return scenes
+
+    # Use paginated query
+    all_scenes: list[Dict[str, Any]] = []
+    page = 1
+    total_count: int | None = None
+
+    while True:
+        LOG.debug("Fetching scenes page %d (page_size=%d)", page, page_size)
+        result: Dict[str, Any] = client.run_query(
+            SCENE_PLAY_HISTORY_PAGINATED_QUERY,
+            variables={"page": page, "per_page": page_size},
+        )
+        scenes_root = result.get("findScenes") or {}
+        scenes = scenes_root.get("scenes") or []
+
+        if total_count is None:
+            total_count = scenes_root.get("count", 0)
+            if max_scenes > 0:
+                scenes_to_fetch = min(total_count, max_scenes)
+                LOG.info(
+                    "Found %d total scenes, will fetch %d scenes",
+                    total_count,
+                    scenes_to_fetch,
+                )
+            else:
+                LOG.info("Found %d total scenes, fetching all", total_count)
+
+        if not scenes:
+            break
+
+        all_scenes.extend(scenes)
+        LOG.debug(
+            "Fetched %d scenes so far (page %d)", len(all_scenes), page
+        )
+
+        # Check if we've reached the max_scenes limit
+        if max_scenes > 0 and len(all_scenes) >= max_scenes:
+            LOG.info("Reached max_scenes limit of %d", max_scenes)
+            all_scenes = all_scenes[:max_scenes]
+            break
+
+        # Check if we've fetched all scenes
+        if len(all_scenes) >= total_count:
+            break
+
+        page += 1
+
+    LOG.info("Fetched %d scenes total", len(all_scenes))
+    return all_scenes
+
+
+def _scrape_once(client: StashClient, config: Config) -> None:
     """Execute a single scrape from Stash and update Prometheus metrics."""
 
     try:
@@ -54,9 +133,9 @@ def _scrape_once(client: StashClient) -> None:
         update_metrics_from_stats(stats)
 
         # Derive playtime buckets and metadata coverage from scene data.
-        scenes_data: Dict[str, Any] = client.run_query(SCENE_PLAY_HISTORY_QUERY)
-        scenes_root = scenes_data.get("findScenes") or {}
-        scenes = scenes_root.get("scenes") or []
+        scenes = _fetch_scenes_paginated(
+            client, config.scene_page_size, config.scene_max_scenes
+        )
         update_playtime_buckets_from_scenes(scenes)
         update_metadata_from_scenes(scenes)
 
@@ -76,7 +155,7 @@ def _scrape_loop(client: StashClient, config: Config) -> None:
 
     while not _SHOULD_STOP:
         start = time.monotonic()
-        _scrape_once(client)
+        _scrape_once(client, config)
         elapsed = time.monotonic() - start
 
         # Sleep the remainder of the interval, but never negative.

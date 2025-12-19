@@ -8,6 +8,8 @@ Environment variables:
     SCRAPE_INTERVAL_SECONDS – Interval between Stash scrapes (default: 30)
     EXPORTER_LISTEN_PORT    – Port for /metrics HTTP server (default: 9100)
     LOG_LEVEL               – Python log level name (default: INFO)
+    SCENE_PAGE_SIZE         – Scenes per page for pagination (default: 1000, -1 = no pagination)
+    SCENE_MAX_SCENES        – Maximum scenes to process (default: -1 = all scenes)
 """
 
 from __future__ import annotations
@@ -26,6 +28,8 @@ class Config:
     scrape_interval_seconds: int
     exporter_listen_port: int
     log_level: str
+    scene_page_size: int
+    scene_max_scenes: int
 
 
 def _get_env_int(name: str, default: int) -> int:
@@ -56,12 +60,22 @@ def load_config() -> Config:
 
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
+    scene_page_size = _get_env_int("SCENE_PAGE_SIZE", 1000)
+    if scene_page_size == 0 or scene_page_size < -1:
+        raise ValueError("SCENE_PAGE_SIZE must be positive or -1")
+
+    scene_max_scenes = _get_env_int("SCENE_MAX_SCENES", -1)
+    if scene_max_scenes == 0 or scene_max_scenes < -1:
+        raise ValueError("SCENE_MAX_SCENES must be positive or -1")
+
     return Config(
         stash_graphql_url=url,
         stash_api_key=api_key,
         scrape_interval_seconds=scrape_interval,
         exporter_listen_port=listen_port,
         log_level=log_level,
+        scene_page_size=scene_page_size,
+        scene_max_scenes=scene_max_scenes,
     )
 
 
