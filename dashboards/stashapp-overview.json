@@ -414,7 +414,7 @@
           "refId": "A"
         }
       ],
-      "title": "Play Duration",
+      "title": "Daily Play Duration",
       "type": "timeseries"
     },
     {
@@ -1426,7 +1426,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "increase(stash_scenes_total[1d])",
+          "expr": "floor(delta(stash_scenes_total[1d]))",
           "legendFormat": "Scenes",
           "range": true,
           "refId": "A"
@@ -1437,7 +1437,7 @@
             "uid": "df7cjcbegurr4d"
           },
           "editorMode": "code",
-          "expr": "increase(stash_performers_total[1d])",
+          "expr": "floor(delta(stash_performers_total[1d]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Performers",
@@ -1450,7 +1450,7 @@
             "uid": "df7cjcbegurr4d"
           },
           "editorMode": "code",
-          "expr": "increase(stash_scene_markers_total[1d])",
+          "expr": "floor(delta(stash_scene_markers_total[1d]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Markers",
@@ -1476,5 +1476,5 @@
   "timezone": "browser",
   "title": "StashApp Library & Playback Overview",
   "uid": "stashapp-overview",
-  "version": 41
+  "version": 43
 }
