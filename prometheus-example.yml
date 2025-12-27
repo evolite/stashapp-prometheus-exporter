@@ -7,8 +7,4 @@ scrape_configs:
     static_configs:
       - targets: ["stash-exporter:9100"]
 
-  - job_name: "podman"
-    static_configs:
-      - targets: ["podman-exporter:9882"]
-
 

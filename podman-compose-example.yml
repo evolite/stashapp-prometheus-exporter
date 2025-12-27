@@ -1,0 +1,20 @@
+version: "3.9"
+
+networks:
+  default:
+    name: stashapp-exporter_default
+
+services:
+  stash-exporter:
+    image: stashapp-prometheus-exporter:local
+    container_name: stash-exporter
+    restart: unless-stopped
+    environment:
+      # URL of your existing Stash instance GraphQL endpoint
+      STASH_GRAPHQL_URL: http://stash:9999/graphql
+      # API key for your Stash instance (replace with your own)
+      STASH_API_KEY: "REPLACE_WITH_YOUR_STASH_API_KEY"
+      # How often the exporter should poll Stash (seconds)
+      SCRAPE_INTERVAL_SECONDS: "30"
+    ports:
+      - "9100:9100"

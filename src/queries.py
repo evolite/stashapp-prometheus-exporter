@@ -52,6 +52,7 @@ query ScenePlayHistory {
       play_count
       play_duration
       play_history
+      o_counter
     }
   }
 }

@@ -14,7 +14,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, Iterable, List
 
-from prometheus_client import Gauge
+from prometheus_client import Gauge, Counter
 
 
 # Primary library metrics
@@ -133,6 +133,18 @@ stash_scene_markers_total = Gauge(
 stash_up = Gauge(
     "stash_up",
     "Whether the last scrape of Stash GraphQL succeeded (1 for success, 0 for failure).",
+)
+
+# Scrape performance metrics
+stash_scrape_duration_seconds = Gauge(
+    "stash_scrape_duration_seconds",
+    "Time spent on the last scrape in seconds.",
+)
+
+stash_scrapes_total = Counter(
+    "stash_scrapes_total",
+    "Total number of scrapes attempted.",
+    labelnames=("status",),
 )
 
 
@@ -331,6 +343,8 @@ def update_tag_usage_from_scenes(scenes: Iterable[Dict[str, Any]]) -> None:
     use each tag and updates the `stash_tag_usage_count` metric with tag names
     as labels. This provides dynamic, engagement-based tag popularity metrics
     based only on played scenes.
+
+    Only the top 100 tags by usage count are exported to limit label cardinality.
     """
 
     # Count tag usage only from played scenes
@@ -348,8 +362,12 @@ def update_tag_usage_from_scenes(scenes: Iterable[Dict[str, Any]]) -> None:
             if tag_name:
                 tag_usage_counts[tag_name] = tag_usage_counts.get(tag_name, 0) + 1
 
-    # Update metrics for tags found in played scenes
-    for tag_name, count in tag_usage_counts.items():
+    # Sort by count (descending) and take top 100 to limit label cardinality
+    sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: x[1], reverse=True)
+    top_tags = sorted_tags[:100]
+
+    # Update metrics only for top 100 tags
+    for tag_name, count in top_tags:
         stash_tag_usage_count.labels(tag_name=tag_name).set(float(count))
 
 
@@ -380,6 +398,8 @@ __all__ = [
     "stash_play_duration_seconds_by_hour",
     "stash_tag_usage_count",
     "stash_up",
+    "stash_scrape_duration_seconds",
+    "stash_scrapes_total",
     "update_metrics_from_stats",
     "update_playtime_buckets_from_scenes",
     "update_metadata_from_scenes",

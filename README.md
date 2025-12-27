@@ -8,9 +8,6 @@ Queries your Stash instance and exposes metrics like total scenes, images, perfo
 
 These queries are based on the public Stash GraphQL API documentation (`https://docs.stashapp.cc/api`) and are intended to return cheap, aggregated statistics suitable for exporter usage.
 
-See `dashboards/stashapp-overview.json` for a Grafana dashboard that uses all of these.
-<img width="690" height="417" alt="image" src="https://github.com/user-attachments/assets/59b422c0-713a-4a3e-8c2e-927d9efdd8dd" />
-
 ## Run with Docker / Podman
 
 ```bash
@@ -30,6 +27,7 @@ For a complete stack example with Stash, Prometheus, and Grafana, see `podman-co
 - `EXPORTER_LISTEN_PORT` - Metrics port (default: `9100`)
 
 ## Metrics
+
 ### Library statistics
 - `stash_scenes_total` - Total scenes
 - `stash_images_total` - Total images
@@ -61,7 +59,7 @@ You can derive the "missing" side and ratios in PromQL, for example:
 - `stash_total_play_count` - Total number of scene plays
 - `stash_total_play_duration_seconds` - Total play duration across all scenes in seconds
 - `stash_scenes_played_total` - Scenes that have at least one recorded play
-- `stash_total_o_count` - Total o-counter across all scenes
+- `stash_total_o_count` - Total orgasm counter across all scenes
 
 ### Playtime patterns
 - `stash_play_duration_seconds_by_dow{day_of_week}` - Play duration by day of week (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
@@ -69,5 +67,9 @@ You can derive the "missing" side and ratios in PromQL, for example:
 
 ### Exporter health
 - `stash_up` - 1 if the last scrape of Stash GraphQL succeeded, 0 otherwise
+- `stash_scrape_duration_seconds` - Time spent on the last scrape in seconds
+- `stash_scrapes_total{status="success|failure"}` - Total number of scrape attempts
+
+See `dashboards/stashapp-overview.json` for a Grafana dashboard that uses all of these.
 
 Images are automatically built and pushed to GHCR on pushes to `main` and version tags.

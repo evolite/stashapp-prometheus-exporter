@@ -11,6 +11,12 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -18,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 7,
   "links": [],
   "panels": [
     {
@@ -480,12 +486,177 @@
       "type": "stat"
     },
     {
+      "datasource": "prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 11
+      },
+      "id": 50,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(\n  5,\n  stash_tag_usage_count{\n    tag_name!~\"(69|Cowgirl|Reverse Cowgirl|Squatting Cowgirl|Squatting Reverse Cowgirl|Side Cowgirl|Missionary|Standing Missionary|Doggy Style|Doggy Style - POV|Standing Doggy Style|Prone Bone|Facesitting|Spooning|Riding|Stand and Carry|Standing 69|Standing Sex|Face Down Ass Up|Pussy Licking Doggy Style|Blowjob|Blowjob - POV|Deepthroat|Handjob|Handjob - POV|Ball Licking|Ball Sucking|Pussy Licking|Oral Sex|Face Fuck|Gagging|Train \\\\(Oral Sex\\\\)|Spit Roast|Titjob|Cum in Mouth|Cum Swallowing|Cum Swapping|Open Mouth Facial|Facial|Kissing|Straight|Big Dick)\"\n  }\n)",
+          "instant": true,
+          "legendFormat": "{{tag_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Tag Distribution (Played Scenes)",
+      "type": "piechart"
+    },
+    {
+      "datasource": "prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 20,
+        "x": 4,
+        "y": 11
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xAxis": {
+          "show": true
+        },
+        "yAxis": {
+          "show": true
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(\n  20,\n  stash_tag_usage_count{\n    tag_name!~\"(69|Cowgirl|Reverse Cowgirl|Squatting Cowgirl|Squatting Reverse Cowgirl|Side Cowgirl|Missionary|Standing Missionary|Doggy Style|Doggy Style - POV|Standing Doggy Style|Prone Bone|Facesitting|Spooning|Riding|Stand and Carry|Standing 69|Standing Sex|Face Down Ass Up|Pussy Licking Doggy Style|Blowjob|Blowjob - POV|Deepthroat|Handjob|Handjob - POV|Ball Licking|Ball Sucking|Pussy Licking|Oral Sex|Face Fuck|Gagging|Train \\\\(Oral Sex\\\\)|Spit Roast|Titjob|Cum in Mouth|Cum Swallowing|Cum Swapping|Open Mouth Facial|Facial|Kissing|Straight|Pussy Fingering|Big Dick)\"\n  }\n)",
+          "legendFormat": "{{tag_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top 10 Tags Over Time (Played Scenes)",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 11
+        "y": 18
       },
       "id": 30,
       "panels": [],
@@ -523,7 +694,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 19
       },
       "id": 31,
       "options": {
@@ -622,7 +793,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 12
+        "y": 19
       },
       "id": 32,
       "options": {
@@ -781,7 +952,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 26
       },
       "id": 40,
       "panels": [],
@@ -814,7 +985,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 27
       },
       "id": 47,
       "options": {
@@ -885,7 +1056,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 32
       },
       "id": 1,
       "panels": [],
@@ -902,12 +1073,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-red",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -919,7 +1086,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 26
+        "y": 33
       },
       "id": 9,
       "options": {
@@ -959,12 +1126,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-green",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -976,7 +1139,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 26
+        "y": 33
       },
       "id": 2,
       "options": {
@@ -1016,12 +1179,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-purple",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1033,7 +1192,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 26
+        "y": 33
       },
       "id": 4,
       "options": {
@@ -1073,12 +1232,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-blue",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1090,7 +1245,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 26
+        "y": 33
       },
       "id": 5,
       "options": {
@@ -1130,12 +1285,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "light-yellow",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1147,7 +1298,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 26
+        "y": 33
       },
       "id": 6,
       "options": {
@@ -1187,12 +1338,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "super-light-orange",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1204,7 +1351,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 26
+        "y": 33
       },
       "id": 48,
       "options": {
@@ -1299,7 +1446,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 30
+        "y": 37
       },
       "id": 18,
       "options": {
@@ -1406,7 +1553,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 30
+        "y": 37
       },
       "id": 49,
       "options": {
@@ -1460,197 +1607,6 @@
       ],
       "title": "Daily library diffs",
       "type": "timeseries"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 36
-      },
-      "id": 50,
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "pieType": "pie",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
-        "displayLabels": [
-          "name",
-          "percent"
-        ]
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "stash_tag_usage_count",
-          "legendFormat": "{{tag_name}}",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Tag Distribution (Played Scenes)",
-      "type": "piechart"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            }
-          },
-          "mappings": [],
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 36
-      },
-      "id": 51,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        },
-        "xAxis": {
-          "show": true
-        },
-        "yAxis": {
-          "show": true
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(10, stash_tag_usage_count)",
-          "legendFormat": "{{tag_name}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Top 10 Tags Over Time (Played Scenes)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 44
-      },
-      "id": 52,
-      "options": {
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Count"
-          }
-        ]
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(20, stash_tag_usage_count)",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Top 20 Tags (Played Scenes)",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "indexByName": {},
-            "renameByName": {
-              "tag_name": "Tag",
-              "Value": "Count"
-            }
-          }
-        }
-      ],
-      "type": "table"
     }
   ],
   "preload": false,
@@ -1660,12 +1616,12 @@
     "list": []
   },
   "time": {
-    "from": "now-30d",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "StashApp Library & Playback Overview",
   "uid": "stashapp-overview",
-  "version": 44
+  "version": 63
 }

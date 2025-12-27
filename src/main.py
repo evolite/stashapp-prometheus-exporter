@@ -17,6 +17,8 @@ from prometheus_client import start_http_server
 
 from .config import Config, configure_logging, load_config
 from .metrics import (
+    stash_scrape_duration_seconds,
+    stash_scrapes_total,
     stash_up,
     update_metadata_from_scenes,
     update_metrics_from_stats,
@@ -49,6 +51,7 @@ def _install_signal_handlers() -> None:
 def _scrape_once(client: StashClient) -> None:
     """Execute a single scrape from Stash and update Prometheus metrics."""
 
+    start_time = time.monotonic()
     try:
         data: Dict[str, Any] = client.run_query(LIBRARY_STATS_QUERY)
         stats = data.get("stats") or {}
@@ -65,10 +68,15 @@ def _scrape_once(client: StashClient) -> None:
         update_tag_usage_from_scenes(scenes)
 
         stash_up.set(1.0)
+        stash_scrapes_total.labels(status="success").inc()
     except StashClientError as exc:
         LOG.error("Failed to scrape Stash GraphQL: %s", exc)
         # Keep last known values for other metrics, but mark exporter as down.
         stash_up.set(0.0)
+        stash_scrapes_total.labels(status="failure").inc()
+    finally:
+        elapsed = time.monotonic() - start_time
+        stash_scrape_duration_seconds.set(elapsed)
 
 
 def _scrape_loop(client: StashClient, config: Config) -> None:
