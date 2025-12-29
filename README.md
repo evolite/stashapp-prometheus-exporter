@@ -6,6 +6,11 @@ Prometheus exporter for StashApp that exposes library stats, curation coverage, 
 
 Queries your Stash instance and exposes metrics like total scenes, images, performers, watch time, play patterns (by day of week and hour of day), and how well your library is organized (organized flag, tags, performers, studios, stashids, markers) on `/metrics` for Prometheus to scrape.
 
+This exporter follows Prometheus best practices by using **synchronous scraping**: metrics are only collected when Prometheus requests them, not on a timer. This ensures:
+- Metrics are always fresh when Prometheus scrapes
+- No stale labels (deleted scenes/tags are automatically cleared)
+- Fully stateless operation
+
 These queries are based on the public Stash GraphQL API documentation (`https://docs.stashapp.cc/api`) and are intended to return cheap, aggregated statistics suitable for exporter usage.
 
 ## Run with Docker / Podman
@@ -23,8 +28,10 @@ For a complete stack example with Stash, Prometheus, and Grafana, see `podman-co
 
 - `STASH_GRAPHQL_URL` - Stash GraphQL endpoint (default: `http://stash:9999/graphql`)
 - `STASH_API_KEY` - Your Stash API key (required)
-- `SCRAPE_INTERVAL_SECONDS` - How often to query Stash (default: `30`)
 - `EXPORTER_LISTEN_PORT` - Metrics port (default: `9100`)
+- `LOG_LEVEL` - Python log level (default: `INFO`)
+
+**Note:** This exporter uses synchronous scraping - metrics are collected when Prometheus requests them, not on a timer. The scrape interval is controlled by Prometheus's `scrape_interval` configuration, not the exporter.
 
 ## Metrics
 

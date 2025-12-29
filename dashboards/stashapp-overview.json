@@ -1635,8 +1635,8 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "points",
-            "fillOpacity": 100,
+            "drawStyle": "line",
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1645,12 +1645,12 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 8,
+            "lineWidth": 1,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "always",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1670,9 +1670,28 @@
               }
             ]
           },
-          "unit": "dateTimeFromNow"
+          "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*/"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "View Scene in Stash",
+                    "url": "http://localhost:9999/scenes/${__field.labels.scene_id}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -1681,25 +1700,10 @@
         "y": 45
       },
       "id": 53,
-      "links": [
-        {
-          "asDropdown": false,
-          "icon": "external-link",
-          "includeVars": false,
-          "keepTime": false,
-          "tags": [],
-          "targetBlank": true,
-          "title": "View Scene in Stash",
-          "tooltip": "Open scene ${__field.labels.scene_id} in Stash",
-          "type": "link",
-          "url": "http://localhost:9999/scenes/${__field.labels.scene_id}"
-        }
-      ],
+      "links": [],
       "options": {
         "legend": {
-          "calcs": [
-            "count"
-          ],
+          "calcs": [],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1707,50 +1711,21 @@
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
-          "sort": "desc"
+          "sort": "none"
         }
       },
       "pluginVersion": "12.3.1",
       "targets": [
         {
           "editorMode": "code",
-          "expr": "stash_orgasm_timestamp_seconds",
+          "expr": "rate(stash_scene_o_counter[5m])",
           "format": "time_series",
-          "legendFormat": "Scene ${scene_id} - O #${orgasm_index}",
+          "legendFormat": "Scene ${scene_id}",
           "range": true,
           "refId": "A"
         }
       ],
-      "transformations": [
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "destinationType": "time",
-                "field": "Value",
-                "inputType": "number"
-              }
-            ],
-            "fields": {}
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "indexByName": {
-              "Value": 0
-            },
-            "renameByName": {
-              "Value": "Time"
-            }
-          }
-        }
-      ],
-      "title": "Orgasm Timeline",
+      "title": "Orgasm Rate (events per second)",
       "type": "timeseries"
     },
     {
@@ -1779,38 +1754,6 @@
           }
         },
         "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              },
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Orgasm Time"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTime"
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              }
-            ]
-          },
           {
             "matcher": {
               "id": "byRegexp",
@@ -1866,7 +1809,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "stash_orgasm_timestamp_seconds",
+          "expr": "stash_scene_o_counter",
           "format": "table",
           "instant": true,
           "refId": "A"
@@ -1876,36 +1819,20 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "orgasm_index": true
-            },
             "indexByName": {
               "Time": 0,
               "Value": 1,
               "scene_id": 2
             },
             "renameByName": {
-              "Time": "Recorded At",
-              "Value": "Orgasm Time",
+              "Time": "Last Updated",
+              "Value": "Total Events",
               "scene_id": "Scene ID"
             }
           }
-        },
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "destinationType": "time",
-                "field": "Orgasm Time",
-                "inputType": "number"
-              }
-            ],
-            "fields": {}
-          }
         }
       ],
-      "title": "Orgasm Events (Click Scene ID to view in Stash)",
+      "title": "Total Orgasm Events by Scene (Click Scene ID to view in Stash)",
       "type": "table"
     }
   ],
