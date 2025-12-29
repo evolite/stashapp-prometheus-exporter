@@ -42,6 +42,7 @@ SCENE_PLAY_HISTORY_QUERY: str = """
 query ScenePlayHistory {
   findScenes(filter: { per_page: -1 }) {
     scenes {
+      id
       organized
       stash_ids { endpoint stash_id }
       tags { name }
@@ -53,6 +54,7 @@ query ScenePlayHistory {
       play_duration
       play_history
       o_counter
+      o_history
     }
   }
 }

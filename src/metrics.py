@@ -167,6 +167,12 @@ stash_tag_usage_count = Gauge(
     labelnames=("tag_name",),
 )
 
+stash_orgasm_timestamp_seconds = Gauge(
+    "stash_orgasm_timestamp_seconds",
+    "Unix timestamp of orgasm events. Each orgasm from each scene is tracked as a separate time series with scene_id and orgasm_index labels.",
+    labelnames=("scene_id", "orgasm_index"),
+)
+
 
 def _safe_int(value: Any) -> int:
     try:
@@ -371,6 +377,56 @@ def update_tag_usage_from_scenes(scenes: Iterable[Dict[str, Any]]) -> None:
         stash_tag_usage_count.labels(tag_name=tag_name).set(float(count))
 
 
+def update_orgasm_history_from_scenes(scenes: Iterable[Dict[str, Any]]) -> None:
+    """Update orgasm timestamp metrics from scene data.
+
+    `scenes` is expected to be the value of `findScenes.scenes` from the
+    `SCENE_PLAY_HISTORY_QUERY` in `queries.py`. This function processes
+    `o_history` from all scenes and exports each orgasm timestamp as a
+    separate time series.
+
+    Each orgasm event is tracked as a Gauge set to the Unix timestamp,
+    allowing Grafana to plot all orgasm events over time as a unified history.
+    Multiple orgasms from the same scene are tracked using an orgasm_index
+    label to differentiate them.
+    """
+
+    # Collect all orgasm events across all scenes
+    # Structure: scene_id -> list of (timestamp, index) tuples
+    scene_orgasms: Dict[str, List[float]] = {}
+
+    for scene in scenes:
+        scene_id = str(scene.get("id", ""))
+        if not scene_id:
+            continue
+
+        o_history = scene.get("o_history") or []
+        if not o_history:
+            continue
+
+        # Parse and collect all orgasm timestamps for this scene
+        timestamps = []
+        for timestamp_str in o_history:
+            dt = _parse_utc_timestamp(str(timestamp_str))
+            if dt is None:
+                continue
+            # Convert to Unix timestamp (seconds since epoch)
+            unix_timestamp = dt.timestamp()
+            timestamps.append(unix_timestamp)
+
+        if timestamps:
+            # Sort timestamps to ensure consistent indexing (oldest first)
+            timestamps.sort()
+            scene_orgasms[scene_id] = timestamps
+
+    # Update metrics: each orgasm gets its own time series using scene_id + orgasm_index
+    for scene_id, timestamps in scene_orgasms.items():
+        for index, timestamp in enumerate(timestamps):
+            # Use orgasm_index starting from 0 for each scene
+            # This allows tracking all orgasms from all scenes as a unified history
+            stash_orgasm_timestamp_seconds.labels(scene_id=scene_id, orgasm_index=str(index)).set(timestamp)
+
+
 __all__ = [
     "stash_scenes_total",
     "stash_images_total",
@@ -404,5 +460,7 @@ __all__ = [
     "update_playtime_buckets_from_scenes",
     "update_metadata_from_scenes",
     "update_tag_usage_from_scenes",
+    "update_orgasm_history_from_scenes",
+    "stash_orgasm_timestamp_seconds",
 ]
 

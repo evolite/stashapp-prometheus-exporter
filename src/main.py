@@ -22,6 +22,7 @@ from .metrics import (
     stash_up,
     update_metadata_from_scenes,
     update_metrics_from_stats,
+    update_orgasm_history_from_scenes,
     update_playtime_buckets_from_scenes,
     update_tag_usage_from_scenes,
 )
@@ -66,6 +67,9 @@ def _scrape_once(client: StashClient) -> None:
 
         # Update tag usage metrics from played scenes only.
         update_tag_usage_from_scenes(scenes)
+
+        # Update orgasm history from all scenes.
+        update_orgasm_history_from_scenes(scenes)
 
         stash_up.set(1.0)
         stash_scrapes_total.labels(status="success").inc()
