@@ -20,7 +20,6 @@ That's it! Point Prometheus at `http://localhost:9100/metrics` and you're good t
 - `EXPORTER_LISTEN_PORT` - Metrics port (default: `9100`)
 - `LOG_LEVEL` - Python log level (default: `INFO`)
 
-The exporter uses synchronous scraping - metrics are collected when Prometheus requests them, not on a timer. This means your metrics are always fresh and there's no stale data hanging around.
 
 ## Metrics
 
@@ -112,13 +111,6 @@ rate(stash_scenes_total[1d])
 ## Dashboard
 
 Check out `dashboards/stashapp-overview.json` for a ready-to-use Grafana dashboard that visualizes all these metrics. Just import it into Grafana and you're set!
-
-## How It Works
-
-The exporter queries your Stash instance via GraphQL and exposes metrics using Prometheus's custom Collector pattern. This means:
-- **Synchronous scraping** - Metrics are fresh when Prometheus requests them
-- **No stale labels** - Deleted scenes/tags automatically disappear
-- **Fully stateless** - No cached data between scrapes
 
 All queries are based on the [public Stash GraphQL API documentation](https://docs.stashapp.cc/api).
 
