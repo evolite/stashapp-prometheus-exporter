@@ -53,6 +53,9 @@ When do you watch? These metrics break it down:
 See which tags are most popular among your played scenes:
 - `stash_tag_usage_count{tag_name}` - Number of played scenes using each tag
   - Only the top 100 tags by usage are exported to limit cardinality
+- `stash_tag_top_rated{tag_name}` - Number of top-rated scenes using each tag
+  - Computed from the top 100 scenes by `rating100`
+  - Only the top 100 tags by usage are exported to limit cardinality
 
 ## O-Count Events
 

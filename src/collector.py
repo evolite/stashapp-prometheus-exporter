@@ -99,6 +99,7 @@ class StashCollector:
             yield from self._collect_playtime_metrics(scenes)
             yield from self._collect_metadata_metrics(scenes)
             yield from self._collect_tag_usage_metrics(scenes)
+            yield from self._collect_top_rated_tag_usage_metrics(scenes)
             yield from self._collect_orgasm_metrics(scenes)
             yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
 
@@ -270,6 +271,44 @@ class StashCollector:
         tag_metric = GaugeMetricFamily(
             "stash_tag_usage_count",
             "Number of played scenes using each tag. Only top 100 tags by usage are exported.",
+            labels=["tag_name"],
+        )
+        for tag_name, count in top_tags:
+            tag_metric.add_metric([tag_name], float(count))
+        yield tag_metric
+
+    def _collect_top_rated_tag_usage_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Collect tag usage metrics from top-rated scenes.
+
+        Tag usage is computed from the top 100 scenes by rating100, then the
+        top 100 tags by usage count are exported to limit label cardinality.
+        Using MetricFamily ensures stale tags are automatically cleared.
+        """
+        rated_scenes = [
+            scene
+            for scene in scenes
+            if _safe_int(scene.get("rating100")) > 0
+        ]
+        rated_scenes.sort(key=lambda scene: _safe_int(scene.get("rating100")), reverse=True)
+        top_scenes = rated_scenes[:100]
+
+        tag_usage_counts: Dict[str, int] = {}
+
+        for scene in top_scenes:
+            scene_tags = scene.get("tags") or []
+            for tag_obj in scene_tags:
+                tag_name = str(tag_obj.get("name", ""))
+                if tag_name:
+                    tag_usage_counts[tag_name] = tag_usage_counts.get(tag_name, 0) + 1
+
+        # Sort by count (descending) and take top 100 to limit label cardinality
+        sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: x[1], reverse=True)
+        top_tags = sorted_tags[:100]
+
+        # Create metric with only current top 100 tags (stale tags automatically cleared)
+        tag_metric = GaugeMetricFamily(
+            "stash_tag_top_rated",
+            "Number of top-rated scenes using each tag. Computed from the top 100 scenes by rating100; only top 100 tags by usage are exported.",
             labels=["tag_name"],
         )
         for tag_name, count in top_tags:

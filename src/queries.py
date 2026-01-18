@@ -50,11 +50,13 @@ query ScenePlayHistory {
       performers { id }
       studio { id }
       scene_markers { id }
+      rating100
 
       play_count
       play_duration
       play_history
       o_counter
+
     }
   }
 }
