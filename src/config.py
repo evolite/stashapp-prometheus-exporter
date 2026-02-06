@@ -12,9 +12,9 @@ Environment variables:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
 import os
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,7 @@ class Config:
     """Runtime configuration for the exporter."""
 
     stash_graphql_url: str
-    stash_api_key: str
+    stash_api_key: str | None
     scrape_interval_seconds: int
     exporter_listen_port: int
     log_level: str
@@ -43,8 +43,6 @@ def load_config() -> Config:
 
     url = os.getenv("STASH_GRAPHQL_URL", "http://stash:9999/graphql").rstrip("/")
     api_key = os.getenv("STASH_API_KEY")
-    if not api_key:
-        raise RuntimeError("STASH_API_KEY environment variable is required")
 
     scrape_interval = _get_env_int("SCRAPE_INTERVAL_SECONDS", 30)
     if scrape_interval <= 0:
@@ -73,5 +71,3 @@ def configure_logging(log_level: str) -> None:
         level=level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
-
-
