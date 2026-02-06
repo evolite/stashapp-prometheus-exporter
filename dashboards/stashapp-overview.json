@@ -4,8 +4,8 @@
       {
         "builtIn": 1,
         "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
+          "type": "datasource",
+          "uid": "grafana"
         },
         "enable": true,
         "hide": true,
@@ -22,7 +22,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "df7cjcbegurr4d"
+          "uid": "${DS_PROMETHEUS}"
         },
         "enable": true,
         "filter": {
@@ -1667,7 +1667,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "df7cjcbegurr4d"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1757,7 +1757,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "df7cjcbegurr4d"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "floor(delta(stash_performers_total[1d]))",
@@ -1770,7 +1770,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "df7cjcbegurr4d"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "floor(delta(stash_scene_markers_total[1d]))",
