@@ -781,7 +781,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(5, stash_scene_o_counter)",
+          "expr": "topk(5, sum(stash_scene_o_counter) by (ocount, scene_id, scene_name))",
           "format": "table",
           "instant": true,
           "refId": "A"
