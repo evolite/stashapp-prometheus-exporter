@@ -44,10 +44,11 @@ query ScenePlayHistory {
     scenes {
       id
       title
+      date
       organized
       stash_ids { endpoint stash_id }
       tags { name }
-      performers { id }
+      performers { id birthdate }
       studio { id }
       scene_markers { id }
       rating100

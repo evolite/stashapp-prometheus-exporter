@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 import re
 import time
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, Iterable
 
 from prometheus_client.core import GaugeMetricFamily
@@ -108,6 +108,19 @@ def _parse_utc_timestamp(value: str) -> datetime | None:
         return None
 
 
+def _parse_date(value: Any) -> date | None:
+    """Parse a date string (e.g. '1990-05-15') to a date object.
+
+    Returns None if parsing fails.
+    """
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value))
+    except (ValueError, TypeError):
+        return None
+
+
 class StashCollector:
     """Custom Prometheus Collector that synchronously scrapes Stash on each /metrics request.
 
@@ -155,6 +168,8 @@ class StashCollector:
             yield from self._collect_top_rated_tag_usage_metrics(scenes)
             yield from self._collect_orgasm_metrics(scenes)
             yield from self._collect_performer_attribute_metrics(performers)
+            yield from self._collect_scene_performer_age_metrics(scenes)
+            yield from self._collect_scene_production_timeline_metrics(scenes)
             yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
 
             # Increment scrape counter (persists across scrapes)
@@ -480,6 +495,64 @@ class StashCollector:
         m = GaugeMetricFamily("stash_performer_gender_count", "Number of performers by gender.", labels=["gender"])
         for label, count in gender_counts.items():
             m.add_metric([label], float(count))
+        yield m
+
+    def _collect_scene_performer_age_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Collect performer age distribution at scene date.
+
+        For each scene with a valid date and each performer with a valid birthdate,
+        compute the performer's age at the time of the scene and bucket by integer age.
+        Only ages 18-80 are included.
+        """
+        age_counts: Dict[str, int] = {}
+
+        for scene in scenes:
+            scene_date = _parse_date(scene.get("date"))
+            if scene_date is None:
+                continue
+
+            for performer in scene.get("performers") or []:
+                birth_date = _parse_date(performer.get("birthdate"))
+                if birth_date is None:
+                    continue
+
+                age = int((scene_date - birth_date).days / 365.25)
+                if 18 <= age <= 80:
+                    key = str(age)
+                    age_counts[key] = age_counts.get(key, 0) + 1
+
+        m = GaugeMetricFamily(
+            "stash_scene_performer_age_count",
+            "Number of scene-performer pairs by performer age at scene date.",
+            labels=["age"],
+        )
+        for age_label, count in sorted(age_counts.items(), key=lambda x: int(x[0])):
+            m.add_metric([age_label], float(count))
+        yield m
+
+    def _collect_scene_production_timeline_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Collect scene production timeline by month.
+
+        For each scene with a valid date, extract the YYYY-MM month and count
+        the number of scenes per month.
+        """
+        month_counts: Dict[str, int] = {}
+
+        for scene in scenes:
+            scene_date = _parse_date(scene.get("date"))
+            if scene_date is None:
+                continue
+
+            month_key = scene_date.strftime("%Y-%m")
+            month_counts[month_key] = month_counts.get(month_key, 0) + 1
+
+        m = GaugeMetricFamily(
+            "stash_scene_production_month_count",
+            "Number of scenes by production month (YYYY-MM).",
+            labels=["month"],
+        )
+        for month_label, count in sorted(month_counts.items()):
+            m.add_metric([month_label], float(count))
         yield m
 
     def _collect_exporter_health_metrics(self, success: bool, duration: float) -> Iterable[GaugeMetricFamily]:

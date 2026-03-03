@@ -90,6 +90,25 @@ Distribution metrics for performer attributes. Each metric has a single label wi
 - `stash_performer_ethnicity_count{ethnicity!="Unknown"}`
 - Top 10 countries: `topk(10, stash_performer_country_count{country!="Unknown"})`
 
+## Performer Age at Scene Date
+
+Distribution of performer ages at the time each scene was produced:
+- `stash_scene_performer_age_count{age}` - Number of scene-performer pairs by performer age at scene date
+  - Labels: integer ages as strings (`"18"`, `"25"`, `"35"`, etc.)
+  - Only ages 18-80 are included
+  - Requires both `date` on the scene and `birthdate` on the performer
+
+**Pro tip:** Visualize as a histogram in Grafana to see the age distribution of performers across your library.
+
+## Scene Production Timeline
+
+Monthly breakdown of when your scenes were produced:
+- `stash_scene_production_month_count{month}` - Number of scenes by production month
+  - Labels: `YYYY-MM` format (`"2023-01"`, `"2024-06"`, etc.)
+  - Only scenes with a valid `date` are included
+
+**Pro tip:** Use a bar chart in Grafana sorted by month label to see your collection's production timeline.
+
 ## Exporter Health
 
 Is the exporter working? These metrics tell you:
