@@ -7,12 +7,11 @@ posting a GraphQL query with an API key header and basic error handling.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-import logging
 import requests
-
 
 LOG = logging.getLogger(__name__)
 
@@ -26,19 +25,22 @@ class StashClient:
     """Simple Stash GraphQL client."""
 
     base_url: str
-    api_key: str
+    api_key: str | None
     timeout_seconds: int = 10
 
-    def run_query(self, query: str, variables: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def run_query(
+        self, query: str, variables: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Execute a GraphQL query and return the `data` dictionary.
 
         Raises StashClientError on network errors, non‑200 responses or GraphQL errors.
         """
 
         headers = {
-            "ApiKey": self.api_key,
             "Content-Type": "application/json",
         }
+        if self.api_key:
+            headers["ApiKey"] = self.api_key
         payload: Dict[str, Any] = {"query": query}
         if variables:
             payload["variables"] = variables
@@ -51,7 +53,9 @@ class StashClient:
                 timeout=self.timeout_seconds,
             )
         except requests.RequestException as exc:
-            raise StashClientError(f"Error connecting to Stash GraphQL at {self.base_url}: {exc}") from exc
+            raise StashClientError(
+                f"Error connecting to Stash GraphQL at {self.base_url}: {exc}"
+            ) from exc
 
         if response.status_code != 200:
             raise StashClientError(
@@ -74,5 +78,3 @@ class StashClient:
 
 
 __all__ = ["StashClient", "StashClientError"]
-
-
