@@ -1,6 +1,6 @@
 # StashApp Prometheus Exporter
 
-A Prometheus exporter for StashApp that exposes your library stats, play patterns, and engagement metrics via GraphQL. Perfect for tracking your collection growth, watching habits, and seeing which scenes get the most love.
+A Prometheus exporter for StashApp that exposes your library stats, play patterns, performer demographics and engagement metrics via GraphQL. 
 
 ## Quick Start
 
