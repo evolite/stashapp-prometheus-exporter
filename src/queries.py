@@ -63,5 +63,24 @@ query ScenePlayHistory {
 """
 
 
-__all__ = ["LIBRARY_STATS_QUERY", "SCENE_PLAY_HISTORY_QUERY"]
+PERFORMER_ATTRIBUTES_QUERY: str = """
+query PerformerAttributes {
+  findPerformers(filter: { per_page: -1 }) {
+    performers {
+      id
+      ethnicity
+      hair_color
+      eye_color
+      height_cm
+      measurements
+      fake_tits
+      country
+      gender
+    }
+  }
+}
+"""
+
+
+__all__ = ["LIBRARY_STATS_QUERY", "SCENE_PLAY_HISTORY_QUERY", "PERFORMER_ATTRIBUTES_QUERY"]
 

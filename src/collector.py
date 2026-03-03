@@ -11,6 +11,7 @@ cleared when they no longer appear in the data.
 from __future__ import annotations
 
 import logging
+import re
 import time
 from datetime import datetime
 from typing import Any, Dict, Iterable
@@ -18,7 +19,7 @@ from typing import Any, Dict, Iterable
 from prometheus_client.core import GaugeMetricFamily
 from prometheus_client import Counter
 
-from .queries import LIBRARY_STATS_QUERY, SCENE_PLAY_HISTORY_QUERY
+from .queries import LIBRARY_STATS_QUERY, PERFORMER_ATTRIBUTES_QUERY, SCENE_PLAY_HISTORY_QUERY
 from .stash_client import StashClient, StashClientError
 
 # Exporter-specific counter that persists across scrapes
@@ -34,6 +35,53 @@ stash_scrapes_total = Counter(
 LOG = logging.getLogger(__name__)
 
 _DOW_NAMES: list[str] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+_CUP_SIZE_RE = re.compile(r"^\d+([A-Za-z]+)")
+
+_HEIGHT_BINS: list[tuple[int, int, str]] = [
+    (0, 139, "Under 140cm"),
+    (140, 144, "140-144cm"),
+    (145, 149, "145-149cm"),
+    (150, 154, "150-154cm"),
+    (155, 159, "155-159cm"),
+    (160, 164, "160-164cm"),
+    (165, 169, "165-169cm"),
+    (170, 174, "170-174cm"),
+    (175, 179, "175-179cm"),
+    (180, 184, "180-184cm"),
+    (185, 189, "185-189cm"),
+    (190, 194, "190-194cm"),
+    (195, 199, "195-199cm"),
+    (200, 9999, "200cm+"),
+]
+
+
+def _normalize_label(value: Any, default: str = "Unknown") -> str:
+    """Coerce None or empty string to a default label."""
+    if value is None:
+        return default
+    s = str(value).strip()
+    return s if s else default
+
+
+def _height_bucket(height_cm: Any) -> str:
+    """Map an integer height in cm to a bucket label."""
+    try:
+        h = int(height_cm)
+    except (TypeError, ValueError):
+        return "Unknown"
+    for lo, hi, label in _HEIGHT_BINS:
+        if lo <= h <= hi:
+            return label
+    return "Unknown"
+
+
+def _parse_cup_size(measurements: Any) -> str:
+    """Extract cup letter(s) from a measurements string like '32B-24-35'."""
+    if not measurements:
+        return "Unknown"
+    m = _CUP_SIZE_RE.match(str(measurements).strip())
+    return m.group(1).upper() if m else "Unknown"
 
 
 def _safe_int(value: Any) -> int:
@@ -92,6 +140,11 @@ class StashCollector:
             scenes_root = scenes_data.get("findScenes") or {}
             scenes = scenes_root.get("scenes") or []
 
+            # Fetch performer data for demographic metrics
+            performer_data: Dict[str, Any] = self.client.run_query(PERFORMER_ATTRIBUTES_QUERY)
+            performers_root = performer_data.get("findPerformers") or {}
+            performers = performers_root.get("performers") or []
+
             scrape_success = True
 
             # Yield all metrics
@@ -101,6 +154,7 @@ class StashCollector:
             yield from self._collect_tag_usage_metrics(scenes)
             yield from self._collect_top_rated_tag_usage_metrics(scenes)
             yield from self._collect_orgasm_metrics(scenes)
+            yield from self._collect_performer_attribute_metrics(performers)
             yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
 
             # Increment scrape counter (persists across scrapes)
@@ -338,6 +392,95 @@ class StashCollector:
                 orgasm_metric.add_metric([scene_id, scene_name], float(o_counter))
 
         yield orgasm_metric
+
+    def _collect_performer_attribute_metrics(self, performers: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Collect performer demographic distribution metrics."""
+        ethnicity_counts: Dict[str, int] = {}
+        hair_color_counts: Dict[str, int] = {}
+        eye_color_counts: Dict[str, int] = {}
+        height_counts: Dict[str, int] = {}
+        cup_size_counts: Dict[str, int] = {}
+        fake_tits_counts: Dict[str, int] = {}
+        country_counts: Dict[str, int] = {}
+        gender_counts: Dict[str, int] = {}
+
+        for p in performers:
+            ethnicity = _normalize_label(p.get("ethnicity"))
+            ethnicity_counts[ethnicity] = ethnicity_counts.get(ethnicity, 0) + 1
+
+            hair = _normalize_label(p.get("hair_color"))
+            hair_color_counts[hair] = hair_color_counts.get(hair, 0) + 1
+
+            eye = _normalize_label(p.get("eye_color"))
+            eye_color_counts[eye] = eye_color_counts.get(eye, 0) + 1
+
+            height = _height_bucket(p.get("height_cm"))
+            height_counts[height] = height_counts.get(height, 0) + 1
+
+            cup = _parse_cup_size(p.get("measurements"))
+            cup_size_counts[cup] = cup_size_counts.get(cup, 0) + 1
+
+            fake = _normalize_label(p.get("fake_tits"))
+            fake_tits_counts[fake] = fake_tits_counts.get(fake, 0) + 1
+
+            country = _normalize_label(p.get("country"))
+            country_counts[country] = country_counts.get(country, 0) + 1
+
+            gender = _normalize_label(p.get("gender"))
+            gender_counts[gender] = gender_counts.get(gender, 0) + 1
+
+        # Ethnicity
+        m = GaugeMetricFamily("stash_performer_ethnicity_count", "Number of performers by ethnicity.", labels=["ethnicity"])
+        for label, count in ethnicity_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Hair color
+        m = GaugeMetricFamily("stash_performer_hair_color_count", "Number of performers by hair color.", labels=["hair_color"])
+        for label, count in hair_color_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Eye color
+        m = GaugeMetricFamily("stash_performer_eye_color_count", "Number of performers by eye color.", labels=["eye_color"])
+        for label, count in eye_color_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Height range
+        m = GaugeMetricFamily("stash_performer_height_range_count", "Number of performers by height range.", labels=["height_range"])
+        for label, count in height_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Cup size
+        m = GaugeMetricFamily("stash_performer_cup_size_count", "Number of performers by cup size.", labels=["cup_size"])
+        for label, count in cup_size_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Fake tits
+        m = GaugeMetricFamily("stash_performer_fake_tits_count", "Number of performers by fake tits status.", labels=["fake_tits"])
+        for label, count in fake_tits_counts.items():
+            m.add_metric([label], float(count))
+        yield m
+
+        # Country - top 50 + "Other"
+        sorted_countries = sorted(country_counts.items(), key=lambda x: x[1], reverse=True)
+        top_countries = sorted_countries[:50]
+        other_count = sum(count for _, count in sorted_countries[50:])
+        m = GaugeMetricFamily("stash_performer_country_count", "Number of performers by country. Top 50 countries are shown; the rest are grouped as 'Other'.", labels=["country"])
+        for label, count in top_countries:
+            m.add_metric([label], float(count))
+        if other_count > 0:
+            m.add_metric(["Other"], float(other_count))
+        yield m
+
+        # Gender
+        m = GaugeMetricFamily("stash_performer_gender_count", "Number of performers by gender.", labels=["gender"])
+        for label, count in gender_counts.items():
+            m.add_metric([label], float(count))
+        yield m
 
     def _collect_exporter_health_metrics(self, success: bool, duration: float) -> Iterable[GaugeMetricFamily]:
         """Collect exporter health and performance metrics."""
