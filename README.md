@@ -16,7 +16,7 @@ Point Prometheus at `http://localhost:9100/metrics` and you're good to go.
 ## Configuration
 
 - `STASH_GRAPHQL_URL` - Stash GraphQL endpoint (default: `http://stash:9999/graphql`)
-- `STASH_API_KEY` - Your Stash API key (required)
+- `STASH_API_KEY` - Your Stash API key (Optional)
 - `EXPORTER_LISTEN_PORT` - Metrics port (default: `9100`)
 - `LOG_LEVEL` - Python log level (default: `INFO`)
 
@@ -60,7 +60,7 @@ topk(10, stash_tag_usage_count)
 
 ## Dashboard
 
-Check out `dashboards/stashapp-overview.json` for a ready-to-use Grafana dashboard that visualizes all these metrics. Just import it into Grafana and you're set!
+I maintain `dashboards/stashapp-overview.json` for a ready-to-use Grafana dashboard that visualizes all these metrics. Just import it into Grafana as json
 
 All queries are based on the [public Stash GraphQL API documentation](https://docs.stashapp.cc/api).
 
