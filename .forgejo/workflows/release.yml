@@ -5,29 +5,22 @@ on:
 
 jobs:
   publish-image:
-    runs-on: codeberg-small
+    runs-on: orange-runner
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install buildah
-        run: apt-get update -qq && apt-get install -y -qq buildah ca-certificates
+      - name: Install Docker CLI
+        run: apt-get update -qq && apt-get install -y -qq docker.io
 
       - name: Build and push image
         run: |
-          buildah build \
-            --storage-driver=vfs \
-            --isolation=chroot \
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login codeberg.org -u surging9143 --password-stdin
+          docker build \
             -t codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
             -t codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
             .
-          buildah push \
-            --storage-driver=vfs \
-            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
-            codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
-          buildah push \
-            --storage-driver=vfs \
-            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
-            codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+          docker push codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
+          docker push codeberg.org/surging9143/stashapp-prometheus-exporter:latest
 
   release:
     runs-on: orange-runner
