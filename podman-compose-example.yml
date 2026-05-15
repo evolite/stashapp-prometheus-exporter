@@ -6,7 +6,7 @@ networks:
 
 services:
   stash-exporter:
-    image: stashapp-prometheus-exporter:local
+    image: codeberg.org/surging9143/stashapp-prometheus-exporter:latest
     container_name: stash-exporter
     restart: unless-stopped
     environment:
