@@ -4,32 +4,38 @@ on:
       - 'v*.*.*'
 
 jobs:
+  publish-image:
+    runs-on: codeberg-small
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install buildah
+        run: apt-get update -qq && apt-get install -y -qq buildah ca-certificates
+
+      - name: Build and push image
+        run: |
+          buildah build \
+            --storage-driver=vfs \
+            --isolation=chroot \
+            -t codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
+            -t codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
+            .
+          buildah push \
+            --storage-driver=vfs \
+            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
+            codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
+          buildah push \
+            --storage-driver=vfs \
+            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
+            codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+
   release:
     runs-on: orange-runner
+    needs: publish-image
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Install Docker CLI
-        run: |
-          apt-get update -qq && apt-get install -y -qq ca-certificates curl
-          install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
-          apt-get update -qq && apt-get install -y -qq docker-ce-cli
-
-      - name: Log in to Codeberg registry
-        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login codeberg.org -u surging9143 --password-stdin
-
-      - name: Build and push image
-        run: |
-          docker build \
-            -t codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
-            -t codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
-            .
-          docker push codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
-          docker push codeberg.org/surging9143/stashapp-prometheus-exporter:latest
 
       - name: Create release
         run: |
