@@ -6,36 +6,26 @@ on:
 jobs:
   release:
     runs-on: orange-runner
-    env:
-      BUILDAH_ISOLATION: chroot
-      STORAGE_DRIVER: vfs
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Install buildah
-        run: apt-get update -qq && apt-get install -y -qq buildah
-
-      - name: Build image
+      - name: Install kaniko
         run: |
-          buildah build \
-            --storage-driver=vfs \
-            --isolation=chroot \
-            -t codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
-            -t codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
-            .
+          curl -sL -o /usr/local/bin/executor \
+            https://github.com/GoogleContainerTools/kaniko/releases/latest/download/executor-linux-amd64
+          chmod +x /usr/local/bin/executor
 
-      - name: Push image
+      - name: Build and push image
         run: |
-          buildah push \
-            --storage-driver=vfs \
-            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
-            codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
-          buildah push \
-            --storage-driver=vfs \
-            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
-            codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+          executor \
+            --context=dir://. \
+            --dockerfile=Dockerfile \
+            --destination=codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
+            --destination=codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
+            --registry-username=surging9143 \
+            --registry-password=${{ secrets.REGISTRY_TOKEN }}
 
       - name: Create release
         run: |
