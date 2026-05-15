@@ -1,0 +1,51 @@
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: orange-runner
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install buildah
+        run: apt-get update -qq && apt-get install -y -qq buildah
+
+      - name: Build image
+        run: |
+          buildah build \
+            --storage-driver=vfs \
+            --isolation=chroot \
+            -t codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
+            -t codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
+            .
+
+      - name: Push image
+        run: |
+          buildah push \
+            --storage-driver=vfs \
+            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
+            codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }}
+          buildah push \
+            --storage-driver=vfs \
+            --creds surging9143:${{ secrets.REGISTRY_TOKEN }} \
+            codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+
+      - name: Create release
+        run: |
+          git fetch --tags --force
+          CURRENT_TAG="${{ github.ref_name }}"
+          PREV_TAG=$(git tag --sort=-version:refname | grep -A1 "^${CURRENT_TAG}$" | tail -1)
+          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$CURRENT_TAG" ]; then
+            NOTES=$(git log "${PREV_TAG}..${CURRENT_TAG}" --pretty=format:"- %s" | grep -viE "^- bump version" || true)
+          fi
+          export NOTES="${NOTES:-No changelog available.}"
+          SHA=$(git rev-parse HEAD)
+          curl -sL -X POST \
+            -H "Authorization: token ${{ secrets.REGISTRY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "https://codeberg.org/api/v1/repos/surging9143/stashapp-prometheus-exporter/releases" \
+            -d "$(python3 -c "import json,os; print(json.dumps({'tag_name':'${CURRENT_TAG}','name':'${CURRENT_TAG}','body':os.environ['NOTES'],'target_commitish':'$SHA','draft':False,'prerelease':False}))")"
