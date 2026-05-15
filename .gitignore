@@ -16,5 +16,6 @@ dist/
 # Cursor / editor metadata not needed in GitHub
 .cursor/
 .cursorignore
+node_modules/
 
 
