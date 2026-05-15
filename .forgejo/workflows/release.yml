@@ -6,6 +6,9 @@ on:
 jobs:
   release:
     runs-on: orange-runner
+    env:
+      BUILDAH_ISOLATION: chroot
+      STORAGE_DRIVER: vfs
     steps:
       - uses: actions/checkout@v3
         with:
