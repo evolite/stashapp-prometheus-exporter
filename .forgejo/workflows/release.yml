@@ -11,21 +11,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install kaniko
+      - name: Debug runner environment
         run: |
-          curl -sL -o /usr/local/bin/executor \
-            https://github.com/GoogleContainerTools/kaniko/releases/latest/download/executor-linux-amd64
-          chmod +x /usr/local/bin/executor
-
-      - name: Build and push image
-        run: |
-          executor \
-            --context=dir://. \
-            --dockerfile=Dockerfile \
-            --destination=codeberg.org/surging9143/stashapp-prometheus-exporter:${{ github.ref_name }} \
-            --destination=codeberg.org/surging9143/stashapp-prometheus-exporter:latest \
-            --registry-username=surging9143 \
-            --registry-password=${{ secrets.REGISTRY_TOKEN }}
+          echo "=== user ===" && id
+          echo "=== docker socket ===" && ls -la /var/run/docker.sock 2>/dev/null || echo "no docker socket"
+          echo "=== docker ===" && which docker 2>/dev/null && docker version 2>/dev/null || echo "no docker"
+          echo "=== podman ===" && which podman 2>/dev/null || echo "no podman"
+          echo "=== buildah ===" && which buildah 2>/dev/null || echo "no buildah"
+          echo "=== kernel ===" && uname -r
+          echo "=== seccomp ===" && cat /proc/self/status | grep -i seccomp || true
+          echo "=== userns ===" && cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null || echo "not available"
 
       - name: Create release
         run: |
