@@ -2,12 +2,10 @@
 Configuration loading for the StashApp Prometheus exporter.
 
 Environment variables:
-    STASH_GRAPHQL_URL       – Stash GraphQL endpoint
-                              (default: http://stash:9999/graphql)
-    STASH_API_KEY           – Stash API key (required)
-    SCRAPE_INTERVAL_SECONDS – Interval between Stash scrapes (default: 30)
-    EXPORTER_LISTEN_PORT    – Port for /metrics HTTP server (default: 9100)
-    LOG_LEVEL               – Python log level name (default: INFO)
+    STASH_GRAPHQL_URL  – Stash GraphQL endpoint (default: http://stash:9999/graphql)
+    STASH_API_KEY      – Stash API key (optional)
+    EXPORTER_LISTEN_PORT – Port for /metrics HTTP server (default: 9100)
+    LOG_LEVEL          – Python log level name (default: INFO)
 """
 
 from __future__ import annotations
@@ -23,7 +21,6 @@ class Config:
 
     stash_graphql_url: str
     stash_api_key: str | None
-    scrape_interval_seconds: int
     exporter_listen_port: int
     log_level: str
 
@@ -44,10 +41,6 @@ def load_config() -> Config:
     url = os.getenv("STASH_GRAPHQL_URL", "http://stash:9999/graphql").rstrip("/")
     api_key = os.getenv("STASH_API_KEY")
 
-    scrape_interval = _get_env_int("SCRAPE_INTERVAL_SECONDS", 30)
-    if scrape_interval <= 0:
-        raise ValueError("SCRAPE_INTERVAL_SECONDS must be positive")
-
     listen_port = _get_env_int("EXPORTER_LISTEN_PORT", 9100)
     if not (1 <= listen_port <= 65535):
         raise ValueError("EXPORTER_LISTEN_PORT must be between 1 and 65535")
@@ -57,7 +50,6 @@ def load_config() -> Config:
     return Config(
         stash_graphql_url=url,
         stash_api_key=api_key,
-        scrape_interval_seconds=scrape_interval,
         exporter_listen_port=listen_port,
         log_level=log_level,
     )

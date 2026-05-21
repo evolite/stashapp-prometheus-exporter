@@ -14,7 +14,8 @@ import logging
 import re
 import time
 from datetime import date, datetime
-from typing import Any, Dict, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from prometheus_client.core import GaugeMetricFamily
 from prometheus_client import Counter
@@ -145,16 +146,16 @@ class StashCollector:
 
         try:
             # Fetch library stats
-            stats_data: Dict[str, Any] = self.client.run_query(LIBRARY_STATS_QUERY)
+            stats_data: dict[str, Any] = self.client.run_query(LIBRARY_STATS_QUERY)
             stats = stats_data.get("stats") or {}
 
             # Fetch scene data for detailed metrics
-            scenes_data: Dict[str, Any] = self.client.run_query(SCENE_PLAY_HISTORY_QUERY)
+            scenes_data: dict[str, Any] = self.client.run_query(SCENE_PLAY_HISTORY_QUERY)
             scenes_root = scenes_data.get("findScenes") or {}
             scenes = scenes_root.get("scenes") or []
 
             # Fetch performer data for demographic metrics
-            performer_data: Dict[str, Any] = self.client.run_query(PERFORMER_ATTRIBUTES_QUERY)
+            performer_data: dict[str, Any] = self.client.run_query(PERFORMER_ATTRIBUTES_QUERY)
             performers_root = performer_data.get("findPerformers") or {}
             performers = performers_root.get("performers") or []
 
@@ -175,14 +176,12 @@ class StashCollector:
             # Increment scrape counter (persists across scrapes)
             stash_scrapes_total.labels(status="success").inc()
 
-        except StashClientError as exc:
-            LOG.error("Failed to scrape Stash GraphQL: %s", exc)
-            # Still yield exporter health metrics to indicate failure
+        except Exception as exc:
+            LOG.error("Failed to scrape Stash: %s", exc)
             yield from self._collect_exporter_health_metrics(False, time.monotonic() - scrape_start)
-            # Increment failure counter
             stash_scrapes_total.labels(status="failure").inc()
 
-    def _collect_library_metrics(self, stats: Dict[str, Any]) -> Iterable[GaugeMetricFamily]:
+    def _collect_library_metrics(self, stats: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         """Collect library-wide aggregate metrics from stats query."""
         # Primary library metrics
         yield GaugeMetricFamily("stash_scenes_total", "Total number of scenes in the Stash library.", value=_safe_int(stats.get("scene_count")))
@@ -209,10 +208,10 @@ class StashCollector:
         yield GaugeMetricFamily("stash_total_play_count", "Total number of scene plays recorded in Stash.", value=_safe_int(stats.get("total_play_count")))
         yield GaugeMetricFamily("stash_scenes_played_total", "Total number of scenes that have at least one recorded play.", value=_safe_int(stats.get("scenes_played")))
 
-    def _collect_playtime_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_playtime_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect play duration metrics bucketed by day of week and hour of day."""
-        dow_totals: Dict[str, float] = {name: 0.0 for name in _DOW_NAMES}
-        hour_totals: Dict[str, float] = {str(h): 0.0 for h in range(24)}
+        dow_totals: dict[str, float] = {name: 0.0 for name in _DOW_NAMES}
+        hour_totals: dict[str, float] = {str(h): 0.0 for h in range(24)}
 
         for scene in scenes:
             play_count = _safe_int(scene.get("play_count"))
@@ -261,7 +260,7 @@ class StashCollector:
             hour_metric.add_metric([hour_key], total_seconds)
         yield hour_metric
 
-    def _collect_metadata_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_metadata_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect metadata/coverage metrics from scene data."""
         organized = 0
         with_stashid = 0
@@ -310,13 +309,13 @@ class StashCollector:
         yield GaugeMetricFamily("stash_scenes_with_markers_total", "Total number of scenes that have at least one scene marker.", value=float(with_markers))
         yield GaugeMetricFamily("stash_scene_markers_total", "Total number of scene markers across all scenes.", value=float(marker_total))
 
-    def _collect_tag_usage_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_tag_usage_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect tag usage metrics from played scenes.
 
         Only the top 100 tags by usage count are exported to limit label cardinality.
         Using MetricFamily ensures stale tags are automatically cleared.
         """
-        tag_usage_counts: Dict[str, int] = {}
+        tag_usage_counts: dict[str, int] = {}
 
         for scene in scenes:
             play_count = _safe_int(scene.get("play_count"))
@@ -343,7 +342,7 @@ class StashCollector:
             tag_metric.add_metric([tag_name], float(count))
         yield tag_metric
 
-    def _collect_top_rated_tag_usage_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_top_rated_tag_usage_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect tag usage metrics from top-rated scenes.
 
         Tag usage is computed from the top 100 scenes by rating100, then the
@@ -358,7 +357,7 @@ class StashCollector:
         rated_scenes.sort(key=lambda scene: _safe_int(scene.get("rating100")), reverse=True)
         top_scenes = rated_scenes[:100]
 
-        tag_usage_counts: Dict[str, int] = {}
+        tag_usage_counts: dict[str, int] = {}
 
         for scene in top_scenes:
             scene_tags = scene.get("tags") or []
@@ -381,7 +380,7 @@ class StashCollector:
             tag_metric.add_metric([tag_name], float(count))
         yield tag_metric
 
-    def _collect_orgasm_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_orgasm_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect orgasm counter metrics per scene.
 
         Only scenes with o_counter > 0 are exported to limit cardinality.
@@ -405,16 +404,16 @@ class StashCollector:
 
         yield orgasm_metric
 
-    def _collect_performer_attribute_metrics(self, performers: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_performer_attribute_metrics(self, performers: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect performer demographic distribution metrics."""
-        ethnicity_counts: Dict[str, int] = {}
-        hair_color_counts: Dict[str, int] = {}
-        eye_color_counts: Dict[str, int] = {}
-        height_counts: Dict[str, int] = {}
-        cup_size_counts: Dict[str, int] = {}
-        fake_tits_counts: Dict[str, int] = {}
-        country_counts: Dict[str, int] = {}
-        gender_counts: Dict[str, int] = {}
+        ethnicity_counts: dict[str, int] = {}
+        hair_color_counts: dict[str, int] = {}
+        eye_color_counts: dict[str, int] = {}
+        height_counts: dict[str, int] = {}
+        cup_size_counts: dict[str, int] = {}
+        fake_tits_counts: dict[str, int] = {}
+        country_counts: dict[str, int] = {}
+        gender_counts: dict[str, int] = {}
 
         for p in performers:
             ethnicity = _normalize_label(p.get("ethnicity"))
@@ -494,14 +493,14 @@ class StashCollector:
             m.add_metric([label], float(count))
         yield m
 
-    def _collect_scene_performer_age_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_scene_performer_age_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect performer age distribution at scene date.
 
         For each scene with a valid date and each performer with a valid birthdate,
         compute the performer's age at the time of the scene and bucket by integer age.
         Only ages 18-80 are included.
         """
-        age_counts: Dict[str, int] = {}
+        age_counts: dict[str, int] = {}
 
         for scene in scenes:
             scene_date = _parse_date(scene.get("date"))
@@ -527,13 +526,13 @@ class StashCollector:
             m.add_metric([age_label], float(count))
         yield m
 
-    def _collect_scene_production_timeline_metrics(self, scenes: Iterable[Dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+    def _collect_scene_production_timeline_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect scene production timeline by month.
 
         For each scene with a valid date, extract the YYYY-MM month and count
         the number of scenes per month.
         """
-        month_counts: Dict[str, int] = {}
+        month_counts: dict[str, int] = {}
 
         for scene in scenes:
             scene_date = _parse_date(scene.get("date"))

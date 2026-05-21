@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 
@@ -29,8 +29,8 @@ class StashClient:
     timeout_seconds: int = 10
 
     def run_query(
-        self, query: str, variables: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, query: str, variables: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Execute a GraphQL query and return the `data` dictionary.
 
         Raises StashClientError on network errors, non‑200 responses or GraphQL errors.
@@ -41,7 +41,7 @@ class StashClient:
         }
         if self.api_key:
             headers["ApiKey"] = self.api_key
-        payload: Dict[str, Any] = {"query": query}
+        payload: dict[str, Any] = {"query": query}
         if variables:
             payload["variables"] = variables
 
