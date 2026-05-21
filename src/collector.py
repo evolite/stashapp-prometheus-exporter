@@ -134,7 +134,7 @@ class StashCollector:
         """Initialize the collector with a Stash client."""
         self.client = client
 
-    def collect(self) -> Iterable[GaugeMetricFamily | CounterMetricFamily]:
+    def collect(self) -> Iterable[GaugeMetricFamily]:
         """Collect metrics from Stash. Called by Prometheus on each scrape.
 
         This method is called synchronously when Prometheus requests /metrics.
@@ -299,10 +299,7 @@ class StashCollector:
             markers = scene.get("scene_markers") or []
             if markers:
                 with_markers += 1
-                try:
-                    marker_total += len(markers)
-                except TypeError:
-                    marker_total += sum(1 for _ in markers)
+                marker_total += len(markers)
 
         yield GaugeMetricFamily("stash_scenes_organized_total", "Total number of scenes marked as organized.", value=float(organized))
         yield GaugeMetricFamily("stash_scenes_with_stashid_total", "Total number of scenes that have at least one StashID entry.", value=float(with_stashid))

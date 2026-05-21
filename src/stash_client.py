@@ -63,18 +63,18 @@ class StashClient:
             )
 
         try:
-            payload = response.json()
+            body = response.json()
         except ValueError as exc:
             raise StashClientError("Invalid JSON received from Stash GraphQL") from exc
 
-        errors = payload.get("errors")
+        errors = body.get("errors")
         if errors:
             raise StashClientError(f"GraphQL errors returned from Stash: {errors}")
 
-        if "data" not in payload:
+        if "data" not in body:
             raise StashClientError("GraphQL response missing 'data' field")
 
-        return payload["data"]
+        return body["data"]
 
 
 __all__ = ["StashClient", "StashClientError"]
