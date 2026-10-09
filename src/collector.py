@@ -193,8 +193,8 @@ class StashCollector:
             # Increment scrape counter (persists across scrapes)
             stash_scrapes_total.labels(status="success").inc()
 
-        except Exception as exc:
-            LOG.error("Failed to scrape Stash: %s", exc)
+        except Exception:
+            LOG.exception("Failed to scrape Stash")
             yield from self._collect_exporter_health_metrics(False, time.monotonic() - scrape_start)
             stash_scrapes_total.labels(status="failure").inc()
 
