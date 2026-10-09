@@ -109,6 +109,23 @@ def _parse_utc_timestamp(value: str) -> datetime | None:
         return None
 
 
+def _iter_play_slices(scenes: Iterable[dict[str, Any]]) -> Iterable[tuple[datetime, float]]:
+    """Yield (play timestamp, approx. seconds) for each play in each scene's history."""
+    for scene in scenes:
+        play_count = _safe_int(scene.get("play_count"))
+        total_duration = float(scene.get("play_duration") or 0.0)
+        history = scene.get("play_history") or []
+        if play_count <= 0 or total_duration <= 0.0 or not history:
+            continue
+
+        # Approximate per-play duration by evenly splitting across history entries
+        per_play_duration = total_duration / float(max(play_count, len(history)))
+        for ts in history:
+            dt = _parse_utc_timestamp(str(ts))
+            if dt is not None:
+                yield dt, per_play_duration
+
+
 def _parse_date(value: Any) -> date | None:
     """Parse a date string (e.g. '1990-05-15') to a date object.
 
@@ -210,35 +227,12 @@ class StashCollector:
 
     def _collect_playtime_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect play duration metrics bucketed by day of week and hour of day."""
-        dow_totals: dict[str, float] = {name: 0.0 for name in _DOW_NAMES}
+        dow_totals: dict[str, float] = dict.fromkeys(_DOW_NAMES, 0.0)
         hour_totals: dict[str, float] = {str(h): 0.0 for h in range(24)}
 
-        for scene in scenes:
-            play_count = _safe_int(scene.get("play_count"))
-            total_duration = float(scene.get("play_duration") or 0.0)
-            history = scene.get("play_history") or []
-
-            if play_count <= 0 or total_duration <= 0.0:
-                continue
-            if not history:
-                continue
-
-            # Approximate per-play duration by evenly splitting across history entries
-            divisor = max(play_count, len(history))
-            per_play_duration = total_duration / float(divisor)
-
-            for ts in history:
-                dt = _parse_utc_timestamp(str(ts))
-                if dt is None:
-                    continue
-
-                dow_index = dt.weekday()
-                if 0 <= dow_index < len(_DOW_NAMES):
-                    dow_name = _DOW_NAMES[dow_index]
-                    dow_totals[dow_name] += per_play_duration
-
-                hour_key = str(dt.hour)
-                hour_totals[hour_key] += per_play_duration
+        for dt, per_play_duration in _iter_play_slices(scenes):
+            dow_totals[_DOW_NAMES[dt.weekday()]] += per_play_duration
+            hour_totals[str(dt.hour)] += per_play_duration
 
         # Yield day-of-week metrics
         dow_metric = GaugeMetricFamily(
@@ -262,43 +256,15 @@ class StashCollector:
 
     def _collect_metadata_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
         """Collect metadata/coverage metrics from scene data."""
-        organized = 0
-        with_stashid = 0
-        tagged = 0
-        with_performers = 0
-        with_studio = 0
-        watched = 0
-        with_markers = 0
-        marker_total = 0
-
-        for scene in scenes:
-            if scene.get("organized"):
-                organized += 1
-
-            stash_ids = scene.get("stash_ids") or []
-            if stash_ids:
-                with_stashid += 1
-
-            tags = scene.get("tags") or []
-            if tags:
-                tagged += 1
-
-            performers = scene.get("performers") or []
-            if performers:
-                with_performers += 1
-
-            studio = scene.get("studio")
-            if studio is not None:
-                with_studio += 1
-
-            play_count = _safe_int(scene.get("play_count"))
-            if play_count > 0:
-                watched += 1
-
-            markers = scene.get("scene_markers") or []
-            if markers:
-                with_markers += 1
-                marker_total += len(markers)
+        scenes = list(scenes)
+        organized = sum(1 for sc in scenes if sc.get("organized"))
+        with_stashid = sum(1 for sc in scenes if sc.get("stash_ids"))
+        tagged = sum(1 for sc in scenes if sc.get("tags"))
+        with_performers = sum(1 for sc in scenes if sc.get("performers"))
+        with_studio = sum(1 for sc in scenes if sc.get("studio") is not None)
+        watched = sum(1 for sc in scenes if _safe_int(sc.get("play_count")) > 0)
+        with_markers = sum(1 for sc in scenes if sc.get("scene_markers"))
+        marker_total = sum(len(sc.get("scene_markers") or []) for sc in scenes)
 
         yield GaugeMetricFamily("stash_scenes_organized_total", "Total number of scenes marked as organized.", value=float(organized))
         yield GaugeMetricFamily("stash_scenes_with_stashid_total", "Total number of scenes that have at least one StashID entry.", value=float(with_stashid))
