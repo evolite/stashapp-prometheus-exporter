@@ -19,9 +19,8 @@ import sys
 from prometheus_client import REGISTRY, start_http_server
 
 from .collector import StashCollector
-from .config import Config, configure_logging, load_config
+from .config import configure_logging, load_config
 from .stash_client import StashClient
-
 
 LOG = logging.getLogger(__name__)
 _SHOULD_STOP = False

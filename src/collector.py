@@ -13,15 +13,19 @@ from __future__ import annotations
 import logging
 import re
 import time
-from datetime import date, datetime
 from collections.abc import Iterable
+from datetime import date, datetime
 from typing import Any
 
-from prometheus_client.core import GaugeMetricFamily
 from prometheus_client import Counter
+from prometheus_client.core import GaugeMetricFamily
 
-from .queries import LIBRARY_STATS_QUERY, PERFORMER_ATTRIBUTES_QUERY, SCENE_PLAY_HISTORY_QUERY
-from .stash_client import StashClient, StashClientError
+from .queries import (
+    LIBRARY_STATS_QUERY,
+    PERFORMER_ATTRIBUTES_QUERY,
+    SCENE_PLAY_HISTORY_QUERY,
+)
+from .stash_client import StashClient
 
 # Exporter-specific counter that persists across scrapes
 # This tracks exporter behavior, not Stash data, so it's acceptable to use
