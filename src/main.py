@@ -44,7 +44,7 @@ def _install_signal_handlers() -> None:
 def main() -> int:
     try:
         config = load_config()
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - any config failure must exit cleanly
         # Logging may not yet be configured; print to stderr as last resort.
         print(f"Failed to load configuration: {exc}", file=sys.stderr)
         return 1
