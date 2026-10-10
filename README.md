@@ -12,7 +12,7 @@ docker run -d \
   -e STASH_GRAPHQL_URL=http://stash:9999/graphql \
   -e STASH_API_KEY=your_api_key \
   -p 9100:9100 \
-  codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+  ghcr.io/evolite/stashapp-prometheus-exporter:latest
 ```
 
 Metrics will be available at `http://localhost:9100/metrics`.
@@ -58,4 +58,4 @@ A pre-built dashboard is available in `dashboards/stashapp-overview.json`. Impor
 
 ## Source
 
-[codeberg.org/surging9143/stashapp-prometheus-exporter](https://codeberg.org/surging9143/stashapp-prometheus-exporter)
+[github.com/evolite/stashapp-prometheus-exporter](https://github.com/evolite/stashapp-prometheus-exporter)

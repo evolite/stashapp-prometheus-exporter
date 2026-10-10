@@ -6,7 +6,7 @@ networks:
 
 services:
   stash-exporter:
-    image: codeberg.org/surging9143/stashapp-prometheus-exporter:latest
+    image: ghcr.io/evolite/stashapp-prometheus-exporter:latest
     container_name: stash-exporter
     restart: unless-stopped
     environment:
