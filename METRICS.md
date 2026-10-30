@@ -1,10 +1,7 @@
 # Metrics Documentation
 
-All metrics are prefixed with `stash_` and follow Prometheus naming conventions.
-
 ## Library Stats
 
-Basic counts of everything in your library:
 - `stash_scenes_total` - Total scenes
 - `stash_images_total` - Total images  
 - `stash_galleries_total` - Total galleries
@@ -18,7 +15,6 @@ Basic counts of everything in your library:
 
 ## Curation & Coverage
 
-How well-organized is your library? These metrics help you track that:
 - `stash_scenes_organized_total` - Scenes marked as organized
 - `stash_scenes_with_stashid_total` - Scenes with at least one StashID
 - `stash_scenes_tagged_total` - Scenes with at least one tag
@@ -28,13 +24,8 @@ How well-organized is your library? These metrics help you track that:
 - `stash_scenes_with_markers_total` - Scenes with at least one marker
 - `stash_scene_markers_total` - Total number of scene markers
 
-**Pro tip:** Calculate coverage ratios with PromQL:
-- StashID coverage: `stash_scenes_with_stashid_total / stash_scenes_total`
-- Organization rate: `stash_scenes_organized_total / stash_scenes_total`
-
 ## Play Statistics
 
-Track your viewing habits:
 - `stash_total_play_count` - Total number of scene plays
 - `stash_total_play_duration_seconds` - Total play duration across all scenes
 - `stash_scenes_played_total` - Scenes that have at least one recorded play
@@ -42,7 +33,6 @@ Track your viewing habits:
 
 ## Playtime Patterns
 
-When do you watch? These metrics break it down:
 - `stash_play_duration_seconds_by_dow{day_of_week}` - Play duration by day of week
   - Labels: `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `Sun`
 - `stash_play_duration_seconds_by_hour{hour_of_day}` - Play duration by hour of day
@@ -50,7 +40,6 @@ When do you watch? These metrics break it down:
 
 ## Tag Usage
 
-See which tags are most popular among your played scenes:
 - `stash_tag_usage_count{tag_name}` - Number of played scenes using each tag
   - Only the top 100 tags by usage are exported to limit cardinality
 - `stash_tag_top_rated{tag_name}` - Number of top-rated scenes using each tag
@@ -59,15 +48,12 @@ See which tags are most popular among your played scenes:
 
 ## O-Count Events
 
-Track o-count events per scene:
 - `stash_scene_o_counter{scene_id, scene_name}` - Current o-count counter value per scene
   - Only scenes with `o_counter > 0` are exported
-  - Use `increase(stash_scene_o_counter[5m])` in PromQL to see new events over time
-  - Use `topk(5, stash_scene_o_counter)` to see your top 5 scenes
 
 ## Performer Demographics
 
-Distribution metrics for performer attributes. Each metric has a single label with the attribute value; performers missing a value are counted as `Unknown`.
+Missing values are exported as `Unknown`.
 
 - `stash_performer_ethnicity_count{ethnicity}` - Number of performers by ethnicity
   - Labels: `Caucasian`, `Black`, `Asian`, `Latin`, `Unknown`, etc.
@@ -86,33 +72,58 @@ Distribution metrics for performer attributes. Each metric has a single label wi
 - `stash_performer_gender_count{gender}` - Number of performers by gender
   - Labels: `FEMALE`, `MALE`, `TRANSGENDER_MALE`, `TRANSGENDER_FEMALE`, `INTERSEX`, `NON_BINARY`, `Unknown`
 
-**Pro tip:** Exclude unknowns in Grafana with label matchers:
-- `stash_performer_ethnicity_count{ethnicity!="Unknown"}`
-- Top 10 countries: `topk(10, stash_performer_country_count{country!="Unknown"})`
-
 ## Performer Age at Scene Date
 
-Distribution of performer ages at the time each scene was produced:
 - `stash_scene_performer_age_count{age}` - Number of scene-performer pairs by performer age at scene date
   - Labels: integer ages as strings (`"18"`, `"25"`, `"35"`, etc.)
   - Only ages 18-80 are included
   - Requires both `date` on the scene and `birthdate` on the performer
 
-**Pro tip:** Visualize as a histogram in Grafana to see the age distribution of performers across your library.
-
 ## Scene Production Timeline
 
-Monthly breakdown of when your scenes were produced:
 - `stash_scene_production_month_count{month}` - Number of scenes by production month
   - Labels: `YYYY-MM` format (`"2023-01"`, `"2024-06"`, etc.)
   - Only scenes with a valid `date` are included
 
-**Pro tip:** Use a bar chart in Grafana sorted by month label to see your collection's production timeline.
+## Scene Files & Quality
+
+- `stash_scene_resolution_count{resolution}` - `4K`, `1080p`, `720p`, `480p`, `SD`, `Unknown` (by short edge)
+- `stash_scene_video_codec_count{codec}` / `stash_scene_audio_codec_count{codec}` - audio `none` means no audio track
+- `stash_scene_duration_bucket_count{bucket}` - `<5m`, `5-20m`, `20-60m`, `1h+`
+- `stash_scenes_without_phash_total` - scenes missing a phash
+
+## Ratings, Freshness & Flags
+
+- `stash_scene_rating_count{rating}` / `stash_performer_rating_count{rating}` - `1`-`5` stars or `unrated`
+- `stash_scene_added_month_count{month}` - scenes added to Stash per `YYYY-MM`
+- `stash_scene_last_played_timestamp_seconds` - unix time of the latest play
+- `stash_scenes_unplayed_total`, `stash_scenes_interactive_total`, `stash_scenes_with_captions_total`, `stash_scenes_in_gallery_total`, `stash_scenes_in_group_total`
+
+## Performers, Studios, Tags
+
+Named series are limited to the top 20; zero values are omitted.
+
+- `stash_performer_scene_count{performer}`, `stash_performer_o_count{performer}`
+- `stash_studio_scene_count{studio}`, `stash_studio_o_count{studio}`
+- `stash_performers_favorite_total`, `stash_performers_without_scenes_total`
+- `stash_studios_organized_total`
+- `stash_tags_unused_total` - tags not applied to any scene, image or performer
+
+## Images & Galleries
+
+- `stash_images_organized_total`, `stash_images_rated_total`, `stash_images_o_count`
+- `stash_image_resolution_count{resolution}`, `stash_image_format_count{format}`
+- `stash_galleries_organized_total`, `stash_galleries_empty_total`
+
+## Stash Server State
+
+- `stash_job_queue_length{status}` - jobs by status (`running`, `ready`, ...)
+- `stash_job_running_progress` - 0-1 progress of the running job, `-1` when idle
+- `stash_system_status_ok`, `stash_database_schema_version`
+- `stash_info{version}` - always 1; `stash_update_available` - 1 when a newer release exists
 
 ## Exporter Health
 
-Is the exporter working? These metrics tell you:
 - `stash_up` - 1 if the last scrape succeeded, 0 otherwise
 - `stash_scrape_duration_seconds` - Time spent on the last scrape
 - `stash_scrapes_total{status="success|failure"}` - Total scrape attempts
-

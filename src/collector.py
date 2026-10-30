@@ -21,6 +21,7 @@ from prometheus_client import Counter
 from prometheus_client.core import GaugeMetricFamily
 
 from .queries import (
+    LIBRARY_EXTRAS_QUERY,
     LIBRARY_STATS_QUERY,
     PERFORMER_ATTRIBUTES_QUERY,
     SCENE_PLAY_HISTORY_QUERY,
@@ -130,6 +131,55 @@ def _iter_play_slices(scenes: Iterable[dict[str, Any]]) -> Iterable[tuple[dateti
                 yield dt, per_play_duration
 
 
+_RESOLUTIONS: list[tuple[int, str]] = [(2160, "4K"), (1080, "1080p"), (720, "720p"), (480, "480p")]
+_TOP_N = 20
+
+
+def _resolution_bucket(width: Any, height: Any) -> str:
+    """Bucket by the short edge so portrait media is classified like landscape."""
+    short = min(_safe_int(width), _safe_int(height))
+    if short <= 0:
+        return "Unknown"
+    # 5% slack so e.g. 1920x1038 (cropped 1080p) still counts as 1080p
+    for floor, label in _RESOLUTIONS:
+        if short >= floor * 0.95:
+            return label
+    return "SD"
+
+
+def _rating_bucket(rating100: Any) -> str:
+    """Map Stash's 0-100 rating to 1-5 stars."""
+    if rating100 is None:
+        return "unrated"
+    return str(max(1, min(5, round(_safe_int(rating100) / 20))))
+
+
+def _duration_bucket(seconds: Any) -> str:
+    s = float(seconds or 0.0)
+    if s < 300:
+        return "<5m"
+    if s < 1200:
+        return "5-20m"
+    if s < 3600:
+        return "20-60m"
+    return "1h+"
+
+
+def _count_family(name: str, doc: str, label: str, counts: dict[str, int]) -> GaugeMetricFamily:
+    m = GaugeMetricFamily(name, doc, labels=[label])
+    for key, n in sorted(counts.items()):
+        m.add_metric([key], n)
+    return m
+
+
+def _top_family(name: str, doc: str, label: str, pairs: Iterable[tuple[str, float]]) -> GaugeMetricFamily:
+    """Top-N (name, value) pairs with value > 0, to bound label cardinality."""
+    m = GaugeMetricFamily(name, doc, labels=[label])
+    for key, v in sorted((p for p in pairs if p[1] > 0), key=lambda x: x[1], reverse=True)[:_TOP_N]:
+        m.add_metric([key], v)
+    return m
+
+
 def _parse_date(value: Any) -> date | None:
     """Parse a date string (e.g. '1990-05-15') to a date object.
 
@@ -180,6 +230,13 @@ class StashCollector:
             performers_root = performer_data.get("findPerformers") or {}
             performers = performers_root.get("performers") or []
 
+            # Extras are best-effort: never fail the core scrape over them
+            try:
+                extras: dict[str, Any] = self.client.run_query(LIBRARY_EXTRAS_QUERY)
+            except Exception:
+                LOG.exception("Failed to fetch library extras")
+                extras = {}
+
             scrape_success = True
 
             # Yield all metrics
@@ -192,6 +249,11 @@ class StashCollector:
             yield from self._collect_performer_attribute_metrics(performers)
             yield from self._collect_scene_performer_age_metrics(scenes)
             yield from self._collect_scene_production_timeline_metrics(scenes)
+            yield from self._collect_scene_file_metrics(scenes)
+            yield from self._collect_scene_engagement_metrics(scenes)
+            yield from self._collect_performer_engagement_metrics(performers)
+            if extras:
+                yield from self._collect_extras_metrics(extras)
             yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
 
             # Increment scrape counter (persists across scrapes)
@@ -520,6 +582,119 @@ class StashCollector:
         for month_label, count in sorted(month_counts.items()):
             m.add_metric([month_label], float(count))
         yield m
+
+    def _collect_scene_file_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Resolution, codec, duration and fingerprint distributions (first file per scene)."""
+        res: dict[str, int] = {}
+        vcodec: dict[str, int] = {}
+        acodec: dict[str, int] = {}
+        dur: dict[str, int] = {}
+        no_phash = 0
+        for sc in scenes:
+            files = sc.get("files") or []
+            if not files:
+                continue
+            f = files[0]
+            k = _resolution_bucket(f.get("width"), f.get("height"))
+            res[k] = res.get(k, 0) + 1
+            k = _normalize_label(f.get("video_codec")).lower()
+            vcodec[k] = vcodec.get(k, 0) + 1
+            k = _normalize_label(f.get("audio_codec"), "none").lower()
+            acodec[k] = acodec.get(k, 0) + 1
+            k = _duration_bucket(f.get("duration"))
+            dur[k] = dur.get(k, 0) + 1
+            if not any(fp.get("type") == "phash" for fp in f.get("fingerprints") or []):
+                no_phash += 1
+        yield _count_family("stash_scene_resolution_count", "Number of scenes by resolution (short edge).", "resolution", res)
+        yield _count_family("stash_scene_video_codec_count", "Number of scenes by video codec.", "codec", vcodec)
+        yield _count_family("stash_scene_audio_codec_count", "Number of scenes by audio codec ('none' = no audio).", "codec", acodec)
+        yield _count_family("stash_scene_duration_bucket_count", "Number of scenes by duration bucket.", "bucket", dur)
+        yield GaugeMetricFamily("stash_scenes_without_phash_total", "Number of scenes whose file has no phash fingerprint.", value=float(no_phash))
+
+    def _collect_scene_engagement_metrics(self, scenes: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        """Ratings, staleness, ingest rate and misc scene flags."""
+        scenes = list(scenes)
+        ratings: dict[str, int] = {}
+        added: dict[str, int] = {}
+        last_played = 0.0
+        for sc in scenes:
+            k = _rating_bucket(sc.get("rating100"))
+            ratings[k] = ratings.get(k, 0) + 1
+            dt = _parse_utc_timestamp(str(sc.get("created_at") or ""))
+            if dt is not None:
+                added[dt.strftime("%Y-%m")] = added.get(dt.strftime("%Y-%m"), 0) + 1
+            dt = _parse_utc_timestamp(str(sc.get("last_played_at") or ""))
+            if dt is not None:
+                last_played = max(last_played, dt.timestamp())
+        yield _count_family("stash_scene_rating_count", "Number of scenes by star rating (1-5) or 'unrated'.", "rating", ratings)
+        yield _count_family("stash_scene_added_month_count", "Number of scenes added to Stash by month (YYYY-MM).", "month", added)
+        yield GaugeMetricFamily("stash_scene_last_played_timestamp_seconds", "Unix time of the most recent scene play (0 if never).", value=last_played)
+        yield GaugeMetricFamily("stash_scenes_unplayed_total", "Number of scenes never played.", value=float(sum(1 for sc in scenes if _safe_int(sc.get("play_count")) <= 0)))
+        yield GaugeMetricFamily("stash_scenes_interactive_total", "Number of interactive (funscript) scenes.", value=float(sum(1 for sc in scenes if sc.get("interactive"))))
+        yield GaugeMetricFamily("stash_scenes_with_captions_total", "Number of scenes with captions.", value=float(sum(1 for sc in scenes if sc.get("captions"))))
+        yield GaugeMetricFamily("stash_scenes_in_gallery_total", "Number of scenes linked to a gallery.", value=float(sum(1 for sc in scenes if sc.get("galleries"))))
+        yield GaugeMetricFamily("stash_scenes_in_group_total", "Number of scenes belonging to a group.", value=float(sum(1 for sc in scenes if sc.get("groups"))))
+
+    def _collect_performer_engagement_metrics(self, performers: Iterable[dict[str, Any]]) -> Iterable[GaugeMetricFamily]:
+        performers = list(performers)
+        ratings: dict[str, int] = {}
+        for p in performers:
+            k = _rating_bucket(p.get("rating100"))
+            ratings[k] = ratings.get(k, 0) + 1
+        yield GaugeMetricFamily("stash_performers_favorite_total", "Number of favorited performers.", value=float(sum(1 for p in performers if p.get("favorite"))))
+        yield GaugeMetricFamily("stash_performers_without_scenes_total", "Number of performers with no scenes.", value=float(sum(1 for p in performers if _safe_int(p.get("scene_count")) == 0)))
+        yield _count_family("stash_performer_rating_count", "Number of performers by star rating (1-5) or 'unrated'.", "rating", ratings)
+        yield _top_family("stash_performer_scene_count", f"Scene count for the top {_TOP_N} performers.", "performer", ((_normalize_label(p.get("name")), _safe_int(p.get("scene_count"))) for p in performers))
+        yield _top_family("stash_performer_o_count", f"O-count for the top {_TOP_N} performers.", "performer", ((_normalize_label(p.get("name")), _safe_int(p.get("o_counter"))) for p in performers))
+
+    def _collect_extras_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
+        """Images, galleries, studios, tags, job queue and system/version info."""
+        images = (extras.get("findImages") or {}).get("images") or []
+        res: dict[str, int] = {}
+        fmt: dict[str, int] = {}
+        for im in images:
+            vf = (im.get("visual_files") or [{}])[0]
+            k = _resolution_bucket(vf.get("width"), vf.get("height"))
+            res[k] = res.get(k, 0) + 1
+            k = _normalize_label(vf.get("format")).lower()
+            fmt[k] = fmt.get(k, 0) + 1
+        yield GaugeMetricFamily("stash_images_organized_total", "Number of images marked organized.", value=float(sum(1 for im in images if im.get("organized"))))
+        yield GaugeMetricFamily("stash_images_rated_total", "Number of images with a rating.", value=float(sum(1 for im in images if im.get("rating100") is not None)))
+        yield GaugeMetricFamily("stash_images_o_count", "Total o-count across images.", value=float(sum(_safe_int(im.get("o_counter")) for im in images)))
+        yield _count_family("stash_image_resolution_count", "Number of images by resolution (short edge).", "resolution", res)
+        yield _count_family("stash_image_format_count", "Number of images by file format.", "format", fmt)
+
+        galleries = (extras.get("findGalleries") or {}).get("galleries") or []
+        yield GaugeMetricFamily("stash_galleries_organized_total", "Number of galleries marked organized.", value=float(sum(1 for g in galleries if g.get("organized"))))
+        yield GaugeMetricFamily("stash_galleries_empty_total", "Number of galleries with no images.", value=float(sum(1 for g in galleries if _safe_int(g.get("image_count")) == 0)))
+
+        studios = (extras.get("findStudios") or {}).get("studios") or []
+        yield GaugeMetricFamily("stash_studios_organized_total", "Number of studios marked organized.", value=float(sum(1 for s in studios if s.get("organized"))))
+        yield _top_family("stash_studio_scene_count", f"Scene count for the top {_TOP_N} studios.", "studio", ((_normalize_label(s.get("name")), _safe_int(s.get("scene_count"))) for s in studios))
+        yield _top_family("stash_studio_o_count", f"O-count for the top {_TOP_N} studios.", "studio", ((_normalize_label(s.get("name")), _safe_int(s.get("o_counter"))) for s in studios))
+
+        tags = (extras.get("findTags") or {}).get("tags") or []
+        unused = sum(1 for t in tags if not (_safe_int(t.get("scene_count")) or _safe_int(t.get("image_count")) or _safe_int(t.get("performer_count"))))
+        yield GaugeMetricFamily("stash_tags_unused_total", "Number of tags not applied to any scene, image or performer.", value=float(unused))
+
+        jobs = extras.get("jobQueue") or []
+        by_status: dict[str, int] = {}
+        for j in jobs:
+            k = _normalize_label(j.get("status")).lower()
+            by_status[k] = by_status.get(k, 0) + 1
+        yield _count_family("stash_job_queue_length", "Number of jobs in the Stash queue by status.", "status", by_status)
+        running = [float(j.get("progress") or 0.0) for j in jobs if str(j.get("status")).upper() == "RUNNING"]
+        yield GaugeMetricFamily("stash_job_running_progress", "Progress (0-1) of the first running job, -1 if none.", value=running[0] if running else -1.0)
+
+        sysstat = extras.get("systemStatus") or {}
+        yield GaugeMetricFamily("stash_system_status_ok", "1 if Stash systemStatus is OK.", value=1.0 if sysstat.get("status") == "OK" else 0.0)
+        yield GaugeMetricFamily("stash_database_schema_version", "Stash database schema version.", value=float(_safe_int(sysstat.get("databaseSchema"))))
+        current = (extras.get("version") or {}).get("version") or ""
+        latest = (extras.get("latestversion") or {}).get("version") or ""
+        info = GaugeMetricFamily("stash_info", "Stash version info.", labels=["version"])
+        info.add_metric([current or "unknown"], 1.0)
+        yield info
+        yield GaugeMetricFamily("stash_update_available", "1 if a newer Stash release exists.", value=1.0 if current and latest and current != latest else 0.0)
 
     def _collect_exporter_health_metrics(self, success: bool, duration: float) -> Iterable[GaugeMetricFamily]:
         """Collect exporter health and performance metrics."""

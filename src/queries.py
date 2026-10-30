@@ -52,6 +52,20 @@ query ScenePlayHistory {
       studio { id }
       scene_markers { id }
       rating100
+      interactive
+      created_at
+      last_played_at
+      captions { language_code }
+      galleries { id }
+      groups { group { id } }
+      files {
+        width
+        height
+        duration
+        video_codec
+        audio_codec
+        fingerprints { type }
+      }
 
       play_count
       play_duration
@@ -69,6 +83,11 @@ query PerformerAttributes {
   findPerformers(filter: { per_page: -1 }) {
     performers {
       id
+      name
+      favorite
+      rating100
+      scene_count
+      o_counter
       ethnicity
       hair_color
       eye_color
@@ -83,5 +102,42 @@ query PerformerAttributes {
 """
 
 
-__all__ = ["LIBRARY_STATS_QUERY", "PERFORMER_ATTRIBUTES_QUERY", "SCENE_PLAY_HISTORY_QUERY"]
+# Images, galleries, studios, tags and operational state. Fetched separately so
+# a failure here never takes down the core metrics.
+LIBRARY_EXTRAS_QUERY: str = """
+query LibraryExtras {
+  findImages(filter: { per_page: -1 }) {
+    images {
+      organized
+      rating100
+      o_counter
+      visual_files {
+        ... on ImageFile { width height format size }
+        ... on VideoFile { width height size }
+      }
+    }
+  }
+  findGalleries(filter: { per_page: -1 }) {
+    galleries { organized image_count }
+  }
+  findStudios(filter: { per_page: -1 }) {
+    studios { name organized scene_count o_counter }
+  }
+  findTags(filter: { per_page: -1 }) {
+    tags { scene_count image_count performer_count }
+  }
+  jobQueue { status progress }
+  systemStatus { status databaseSchema }
+  version { version }
+  latestversion { version }
+}
+"""
+
+
+__all__ = [
+    "LIBRARY_EXTRAS_QUERY",
+    "LIBRARY_STATS_QUERY",
+    "PERFORMER_ATTRIBUTES_QUERY",
+    "SCENE_PLAY_HISTORY_QUERY",
+]
 
