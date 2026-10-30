@@ -127,6 +127,7 @@ LIBRARY_IMAGES_QUERY: str = """
 query LibraryImages {
   findImages(filter: { per_page: -1 }) {
     images {
+      created_at
       organized
       rating100
       o_counter

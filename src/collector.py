@@ -728,6 +728,8 @@ class StashCollector:
         yield GaugeMetricFamily("stash_images_with_performers_total", "Number of images with at least one performer.", value=float(sum(1 for im in images if im.get("performers"))))
         yield GaugeMetricFamily("stash_images_o_count", "Total o-count across images.", value=float(sum(_safe_int(im.get("o_counter")) for im in images)))
         yield _count_family("stash_image_resolution_count", "Number of images by resolution (short edge).", "resolution", res)
+        added = _tally(dt.strftime("%Y-%m") for im in images if (dt := _parse_utc_timestamp(str(im.get("created_at") or ""))))
+        yield _count_family("stash_image_added_month_count", "Number of images added to Stash by month (YYYY-MM).", "month", added)
         yield _count_family("stash_image_format_count", "Number of images by file format.", "format", fmt)
 
     def _collect_catalog_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:

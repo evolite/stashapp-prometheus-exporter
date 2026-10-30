@@ -118,7 +118,7 @@ Image metrics come from a full image listing (slow: Stash doesn't index images).
 - `stash_extras_up` - 1 if the extras query (everything below, plus studios/tags/server info) succeeded; 0 means those metrics are being dropped
 
 - `stash_images_organized_total`, `stash_images_rated_total`, `stash_images_tagged_total`, `stash_images_with_performers_total`, `stash_images_o_count`
-- `stash_image_resolution_count{resolution}`, `stash_image_format_count{format}`
+- `stash_image_resolution_count{resolution}`, `stash_image_format_count{format}`, `stash_image_added_month_count{month}`
 - `stash_galleries_organized_total`, `stash_galleries_empty_total`
 
 ## Stash Server State
