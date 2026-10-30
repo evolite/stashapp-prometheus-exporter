@@ -4,7 +4,7 @@
       {
         "builtIn": 1,
         "datasource": {
-          "type": "datasource",
+          "type": "grafana",
           "uid": "grafana"
         },
         "enable": true,
@@ -18,51 +18,13 @@
           "type": "dashboard"
         },
         "type": "dashboard"
-      },
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "enable": true,
-        "filter": {
-          "exclude": false,
-          "ids": [
-            33
-          ]
-        },
-        "hide": false,
-        "iconColor": "dark-blue",
-        "mappings": {
-          "id": {
-            "source": "field",
-            "value": "Time"
-          },
-          "text": {
-            "source": "field",
-            "value": "{instance=\"stash-exporter:9100\", job=\"stashapp\", scene_id=\"166\"}"
-          },
-          "title": {
-            "source": "field",
-            "value": "{instance=\"stash-exporter:9100\", job=\"stashapp\", scene_id=\"166\"}"
-          }
-        },
-        "name": "ohistory",
-        "target": {
-          "expr": "floor(delta(stash_scene_o_counter[5m]))",
-          "interval": "",
-          "refId": "Anno"
-        },
-        "textFormat": "http://localhost:9999/scenes/{{scene_id}}",
-        "titleFormat": "{{scene_name}}",
-        "useValueForTime": false
       }
     ]
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
@@ -72,260 +34,60 @@
         "x": 0,
         "y": 0
       },
-      "id": 13,
-      "panels": [],
-      "title": "Engagement & Playback",
+      "id": 92,
+      "title": "Health",
       "type": "row"
     },
     {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 0,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 1
-      },
-      "id": 14,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "expr": "stash_total_play_count",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Plays",
-      "type": "stat"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 0,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 1
-      },
-      "id": 15,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "expr": "stash_scenes_played_total",
-          "refId": "A"
-        }
-      ],
-      "title": "Scenes Played (unique)",
-      "type": "stat"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 1,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 1
-      },
-      "id": 16,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "stash_total_play_duration_seconds",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Total Watch Time",
-      "type": "stat"
-    },
-    {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 0,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 1
-      },
-      "id": 17,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "expr": "stash_total_o_count",
-          "refId": "A"
-        }
-      ],
-      "title": "Total O Counter",
-      "type": "stat"
-    },
-    {
-      "datasource": "prometheus",
+      "description": "Healthy when Prometheus can scrape the Stash exporter (matches any scrape job named stash*).",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic-by-name"
+            "mode": "thresholds"
           },
-          "decimals": 2,
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Down"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Healthy"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "red",
+                  "index": 2,
+                  "text": "Down"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "Down",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": 0
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "green",
+                "value": 1
               }
             ]
           },
@@ -335,11 +97,164 @@
       },
       "gridPos": {
         "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 93,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "up{job=~\"stash.*\"}",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Exporter",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Healthy when the exporter can reach Stash and read its data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Down"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Healthy"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "red",
+                  "index": 2,
+                  "text": "Down"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "Down",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 94,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_up",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Stash",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 86,
+      "title": "Library Overview",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bytes"
+        }
+      },
+      "gridPos": {
+        "h": 4,
         "w": 4,
         "x": 0,
         "y": 5
       },
-      "id": 20,
+      "id": 9,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -353,22 +268,389 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
+        "showPercentChange": true,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.4.0",
+      "pluginVersion": "13.2.3",
       "targets": [
         {
-          "expr": "stash_total_play_count / clamp_min(stash_scenes_played_total, 1)",
+          "expr": "stash_files_size_bytes",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
           "refId": "A"
         }
       ],
-      "title": "Avg Plays per Played Scene",
+      "title": "Library Size",
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Show Scenes",
+              "url": "http://localhost:9999/scenes?sortby=date"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 5
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_scenes_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Scenes",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Show Images",
+              "url": "http://localhost:9999/images?sortby=random_20088047"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 5
+      },
+      "id": 71,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_images_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Images",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Show Markers",
+              "url": "http://localhost:9999/scenes/markers?sortby=title"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "super-light-orange",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 12,
+        "y": 5
+      },
+      "id": 48,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_scene_markers_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Markers",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "title": "Show Performers",
+              "url": "http://localhost:9999/performers?sortby=name"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-purple",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 5
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_performers_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Performers",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Show Studios",
+              "url": "http://localhost:9999/studios?sortby=name"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 5
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_studios_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Studios",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Show Tags",
+              "url": "http://localhost:9999/tags?sortby=name"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 5
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_tags_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Tags",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -376,7 +658,7 @@
           },
           "custom": {
             "axisBorderShow": false,
-            "axisCenteredZero": false,
+            "axisCenteredZero": true,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
@@ -408,8 +690,6 @@
               "mode": "off"
             }
           },
-          "decimals": 1,
-          "mappings": [],
           "noValue": "0",
           "thresholds": {
             "mode": "absolute",
@@ -423,26 +703,27 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
+          }
+        }
       },
       "gridPos": {
-        "h": 6,
-        "w": 20,
-        "x": 4,
-        "y": 5
+        "h": 4,
+        "w": 18,
+        "x": 0,
+        "y": 9
       },
-      "id": 33,
+      "id": 49,
       "interval": "1d",
-      "maxDataPoints": 1,
       "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
         "legend": {
           "calcs": [],
-          "displayMode": "table",
+          "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -450,28 +731,313 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.4.0",
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "floor(delta(stash_scenes_total[1d]))",
+          "legendFormat": "Scenes",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "floor(delta(stash_performers_total[1d]))",
+          "instant": false,
+          "legendFormat": "Performers",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "floor(delta(stash_scene_markers_total[1d]))",
+          "instant": false,
+          "legendFormat": "Markers",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "floor(delta(stash_images_total[1d]))",
+          "instant": false,
+          "legendFormat": "Images",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Daily library diffs",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Median of scenes added per month, across all months Stash has data for (12). The median ignores the Nov 2025 bulk import (362 scenes) that skews the mean (62).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 9
+      },
+      "id": 95,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "clamp_min(delta(stash_total_play_duration_seconds[1d]), 0)",
-          "legendFormat": "playtime",
+          "expr": "quantile(0.5, stash_scene_added_month_count)",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Median scenes/mo",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Median of images added per month, across all months Stash has data for (10, since Jan 2026). The median ignores spiky months (3,654 in Jan, 3,987 in May) that lift the mean (1,460).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 9
+      },
+      "id": 96,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "quantile(0.5, stash_image_added_month_count)",
+          "instant": true,
+          "legendFormat": "",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Median images/mo",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 87,
+      "title": "Engagement & Playback",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 14
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_total_play_count",
+          "format": "time_series",
+          "instant": false,
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Daily Play Activity",
-      "type": "timeseries"
+      "title": "Total Plays",
+      "type": "stat"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic-by-name"
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 14
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_scenes_played_total",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Scenes Played (unique)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
           "decimals": 1,
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -486,14 +1052,131 @@
             ]
           },
           "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 14
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "overrides": []
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_total_play_duration_seconds",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Watch Time",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 14
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_total_o_count",
+          "format": "time_series",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total O Counter",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        }
       },
       "gridPos": {
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 8
+        "y": 18
       },
       "id": 21,
       "options": {
@@ -513,11 +1196,11 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.4.0",
+      "pluginVersion": "13.2.3",
       "targets": [
         {
           "editorMode": "code",
-          "expr": "stash_total_play_duration_seconds / clamp_min(stash_total_play_count, 1)",
+          "expr": "stash_total_play_duration_seconds / clamp_max(stash_total_play_count, 1e9)",
           "range": true,
           "refId": "A"
         }
@@ -526,81 +1209,11 @@
       "type": "stat"
     },
     {
-      "datasource": "prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Show Tags",
-              "url": "http://localhost:9999/tags?q=${__series.name}&sortby=name"
-            }
-          ],
-          "mappings": []
-        },
-        "overrides": []
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
       },
-      "gridPos": {
-        "h": 7,
-        "w": 4,
-        "x": 0,
-        "y": 11
-      },
-      "id": 50,
-      "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": false,
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.4.0",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(\n  5,\n  stash_tag_usage_count{\n    tag_name!~\"(69|Cowgirl|Reverse Cowgirl|Squatting Cowgirl|Squatting Reverse Cowgirl|Side Cowgirl|Missionary|Standing Missionary|Doggy Style|Doggy Style - POV|Standing Doggy Style|Prone Bone|Facesitting|Spooning|Riding|Stand and Carry|Standing 69|Standing Sex|Face Down Ass Up|Pussy Licking Doggy Style|Blowjob|Blowjob - POV|Deepthroat|Handjob|Handjob - POV|Ball Licking|Ball Sucking|Pussy Licking|Oral Sex|Face Fuck|Gagging|Train \\\\(Oral Sex\\\\)|Spit Roast|Titjob|Cum in Mouth|Cum Swallowing|Cum Swapping|Open Mouth Facial|Facial|Kissing|Straight|Big Dick)\"\n  }\n)",
-          "instant": true,
-          "legendFormat": "{{tag_name}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Tag Distribution (Played Scenes)",
-      "type": "piechart"
-    },
-    {
-      "datasource": "prometheus",
+      "description": "Number of scene plays recorded per day. Stash does not track image plays, so images are not included here. Scene plays only: this is not a measure of viewing time or image views.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -640,7 +1253,8 @@
               "mode": "off"
             }
           },
-          "mappings": [],
+          "decimals": 0,
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -654,17 +1268,1428 @@
               }
             ]
           },
-          "unit": "short"
-        },
-        "overrides": []
+          "unit": "none"
+        }
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
+        "h": 6,
+        "w": 16,
         "x": 4,
-        "y": 11
+        "y": 18
       },
-      "id": 51,
+      "id": 33,
+      "interval": "1d",
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "clamp_min(round(delta(stash_total_play_count[1d])), 0)",
+          "instant": false,
+          "legendFormat": "plays",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Daily Plays",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Share of scenes with at least one recorded play. Unwatched = the remainder.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 20,
+        "y": 18
+      },
+      "id": 78,
+      "options": {
+        "barShape": "flat",
+        "barWidthFactor": 0.5,
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
+        },
+        "endpointMarker": "point",
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "shape": "gauge",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "sparkline": false,
+        "textMode": "auto"
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "stash_scenes_played_total / stash_scenes_total * 100",
+          "instant": false,
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Scenes watched",
+      "type": "gauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 21
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_total_play_count / clamp_max(stash_scenes_played_total, 1e9)",
+          "refId": "A"
+        }
+      ],
+      "title": "Avg Plays per Played Scene",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 89,
+      "title": "Library Curation",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 47,
+      "options": {
+        "displayMode": "basic",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_scenes_organized_total / stash_scenes_total * 100",
+          "legendFormat": "Organized",
+          "refId": "A"
+        },
+        {
+          "expr": "stash_scenes_with_stashid_total / stash_scenes_total * 100",
+          "legendFormat": "StashID",
+          "refId": "B"
+        },
+        {
+          "expr": "stash_scenes_tagged_total / stash_scenes_total * 100",
+          "legendFormat": "Tagged",
+          "refId": "C"
+        },
+        {
+          "expr": "stash_scenes_with_performers_total / stash_scenes_total * 100",
+          "legendFormat": "Performers",
+          "refId": "D"
+        },
+        {
+          "expr": "stash_scenes_with_studio_total / stash_scenes_total * 100",
+          "legendFormat": "Studio",
+          "refId": "E"
+        },
+        {
+          "editorMode": "code",
+          "expr": "stash_scenes_with_markers_total / stash_scenes_total * 100",
+          "legendFormat": "Markers",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "editorMode": "code",
+          "expr": "(stash_scenes_total - on(instance,job) stash_scene_rating_count{rating=\"unrated\"}) / stash_scenes_total * 100",
+          "legendFormat": "Rated",
+          "range": true,
+          "refId": "G"
+        }
+      ],
+      "title": "Scenes curation coverage",
+      "type": "bargauge"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 77,
+      "options": {
+        "displayMode": "basic",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "expr": "stash_images_organized_total / stash_images_total * 100",
+          "legendFormat": "Organized",
+          "refId": "A"
+        },
+        {
+          "expr": "stash_images_rated_total / stash_images_total * 100",
+          "legendFormat": "Rated",
+          "refId": "B"
+        },
+        {
+          "expr": "stash_images_tagged_total / stash_images_total * 100",
+          "legendFormat": "Tagged",
+          "refId": "C"
+        },
+        {
+          "expr": "stash_images_with_performers_total / stash_images_total * 100",
+          "legendFormat": "Performers",
+          "refId": "D"
+        }
+      ],
+      "title": "Images curation coverage",
+      "type": "bargauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 88,
+      "title": "Playtime Patterns",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Watch time (h)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "h"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 10,
+        "x": 0,
+        "y": 31
+      },
+      "id": 31,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "day",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(stash_play_duration_seconds_by_dow / 3600,\"day\",\"$1\",\"day_of_week\",\"(.*)\"),\"o\",\"1\",\"day_of_week\",\"Mon\"),\"day\",\"Monday\",\"day_of_week\",\"Mon\"),\"o\",\"2\",\"day_of_week\",\"Tue\"),\"day\",\"Tuesday\",\"day_of_week\",\"Tue\"),\"o\",\"3\",\"day_of_week\",\"Wed\"),\"day\",\"Wednesday\",\"day_of_week\",\"Wed\"),\"o\",\"4\",\"day_of_week\",\"Thu\"),\"day\",\"Thursday\",\"day_of_week\",\"Thu\"),\"o\",\"5\",\"day_of_week\",\"Fri\"),\"day\",\"Friday\",\"day_of_week\",\"Fri\"),\"o\",\"6\",\"day_of_week\",\"Sat\"),\"day\",\"Saturday\",\"day_of_week\",\"Sat\"),\"o\",\"7\",\"day_of_week\",\"Sun\"),\"day\",\"Sunday\",\"day_of_week\",\"Sun\")",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Watch Time by Day of Week",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "o"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "o"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "day": false,
+              "day_of_week": true,
+              "hour_of_day": true,
+              "instance": true,
+              "job": true,
+              "o": true
+            },
+            "renameByName": {
+              "Value": "Watch time (h)"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Watch time (h)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "h"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 14,
+        "x": 10,
+        "y": 31
+      },
+      "id": 32,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "hr",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "label_replace(label_replace(label_replace(stash_play_duration_seconds_by_hour / 3600,\"o\",\"$1\",\"hour_of_day\",\"(.*)\"),\"hr\",\"$1\",\"hour_of_day\",\"(.*)\"),\"hr\",\"0$1\",\"hour_of_day\",\"(\\\\d)\")",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Watch Time by Hour of Day",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "o"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "o"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "day_of_week": true,
+              "hour_of_day": true,
+              "hr": false,
+              "instance": true,
+              "job": true,
+              "o": true
+            },
+            "renameByName": {
+              "Value": "Watch time (h)"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "id": 90,
+      "title": "Scene Quality",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Scenes by short-edge resolution.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 0,
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 37
+      },
+      "id": 81,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sort_desc(stash_scene_resolution_count)",
+          "instant": true,
+          "legendFormat": "{{resolution}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Scene resolution",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Scenes by video codec.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 0,
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 37
+      },
+      "id": 82,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sort_desc(stash_scene_video_codec_count)",
+          "instant": true,
+          "legendFormat": "{{codec}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Video codec",
+      "type": "piechart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "super-light-yellow",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "series",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 10
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 20
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 37
+      },
+      "id": 70,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": "month",
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "maxWidth": 1,
+          "mode": "none",
+          "sort": "none"
+        },
+        "xField": "month",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sort(stash_scene_production_month_count)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{month}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Scene Production Timeline (by Month)",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "keepLabels": [
+              "month"
+            ],
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "YYYY-MM",
+                "destinationType": "time",
+                "targetField": "month"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "month"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 91,
+      "title": "Performer Demographics",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "Show Performers",
+              "url": "http://localhost:9999/performers?c=(%22type%22:%22ethnicity%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 0,
+        "y": 43
+      },
+      "id": 61,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_performer_ethnicity_count{ethnicity!=\"Unknown\"}",
+          "instant": true,
+          "legendFormat": "{{ethnicity}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Ethnicity",
+      "type": "piechart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "Show Performers",
+              "url": "http://localhost:9999/performers?c=(%22type%22:%22hair_color%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 3,
+        "y": 43
+      },
+      "id": 62,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_performer_hair_color_count{hair_color!=\"Unknown\"}",
+          "instant": true,
+          "legendFormat": "{{hair_color}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Hair Color",
+      "type": "piechart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "Show Perfomers",
+              "url": "http://localhost:9999/performers?c=(%22type%22:%22eye_color%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 6,
+        "y": 43
+      },
+      "id": 63,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_performer_eye_color_count{eye_color!=\"Unknown\"}",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "{{eye_color}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Eye Color",
+      "type": "piechart"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#73BF69",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 9,
+        "y": 43
+      },
+      "id": 66,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "stash_performer_cup_size_count{cup_size!=\"Unknown\"}",
+          "instant": true,
+          "legendFormat": "{{cup_size}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Cup Size",
+      "type": "piechart"
+    },
+    {
+      "description": "Performers by height range (Unknown excluded). Bars = count per bucket; line = 3-bucket centered moving average. X = lower bound of each range in cm (Under 140cm plotted at 135).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlPu"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Performers"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trend"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "h"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "suffix: cm"
+              },
+              {
+                "id": "displayName",
+                "value": "Height"
+              },
+              {
+                "id": "min",
+                "value": 132
+              },
+              {
+                "id": "max",
+                "value": 188
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 43
+      },
+      "id": 65,
       "options": {
         "legend": {
           "calcs": [],
@@ -677,50 +2702,109 @@
           "mode": "multi",
           "sort": "none"
         },
-        "xAxis": {
-          "show": true
-        },
-        "yAxis": {
-          "show": true
-        }
+        "xField": "h"
       },
-      "pluginVersion": "12.4.0",
+      "pluginVersion": "13.2.3",
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(\n  20,\n  stash_tag_usage_count{\n    tag_name!~\"(69|Cowgirl|Reverse Cowgirl|Squatting Cowgirl|Squatting Reverse Cowgirl|Side Cowgirl|Missionary|Standing Missionary|Doggy Style|Doggy Style - POV|Standing Doggy Style|Prone Bone|Facesitting|Spooning|Riding|Stand and Carry|Standing 69|Standing Sex|Face Down Ass Up|Pussy Licking Doggy Style|Blowjob|Blowjob - POV|Deepthroat|Handjob|Handjob - POV|Ball Licking|Ball Sucking|Pussy Licking|Oral Sex|Face Fuck|Gagging|Train \\\\(Oral Sex\\\\)|Spit Roast|Titjob|Cum in Mouth|Cum Swallowing|Cum Swapping|Open Mouth Facial|Facial|Kissing|Straight|Pussy Fingering|Big Dick)\"\n  }\n)",
-          "legendFormat": "{{tag_name}}",
-          "range": true,
+          "expr": "label_replace(label_replace(stash_performer_height_range_count{height_range!=\"Unknown\"},\"h\",\"$1\",\"height_range\",\"(\\\\d+).*\"),\"h\",\"135\",\"height_range\",\"Under.*\")",
+          "format": "table",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Top 10 Tags Over Time (Played Scenes)",
-      "type": "timeseries"
+      "title": "Height Distribution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "h"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "h"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Trend",
+            "mode": "windowFunctions",
+            "replaceFields": false,
+            "window": {
+              "field": "Value",
+              "reducer": "mean",
+              "windowAlignment": "centered",
+              "windowSize": 3,
+              "windowSizeMode": "fixed"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "height_range": true,
+              "instance": true,
+              "job": true
+            },
+            "indexByName": {
+              "Trend": 2,
+              "Value": 1,
+              "h": 0
+            },
+            "renameByName": {
+              "Value": "Performers"
+            }
+          }
+        }
+      ],
+      "type": "trend"
     },
     {
-      "datasource": "prometheus",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "continuous-BlPu"
           },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "footer": {
-              "reducers": []
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
             },
-            "inspect": false
-          },
-          "links": [
-            {
-              "title": "View Scene",
-              "url": "http://localhost:9999/scenes/{{scene_id}}"
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          ],
-          "mappings": [],
+          },
+          "decimals": 0,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -729,2928 +2813,323 @@
                 "value": 0
               }
             ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "OCount"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 69
-              }
-            ]
           },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Scene ID"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 95
-              }
-            ]
-          }
-        ]
+          "unit": "none"
+        }
       },
       "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 16,
-        "y": 11
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 48
       },
-      "id": 54,
+      "id": 68,
       "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Value"
-          }
-        ]
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "country",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
-      "pluginVersion": "12.4.0",
+      "pluginVersion": "13.2.3",
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(5, sum(stash_scene_o_counter) by (ocount, scene_id, scene_name))",
+          "expr": "topk(10, stash_performer_country_count{country!=\"Unknown\"})",
           "format": "table",
           "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Top 5 Scenes by o-count",
+      "title": "Top 10 Countries",
       "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Value"
+              }
+            ]
+          }
+        },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
               "Time": true,
-              "Value": false,
               "__name__": true,
               "instance": true,
-              "job": true,
-              "scene_id": false
-            },
-            "includeByName": {},
-            "indexByName": {
-              "Time": 0,
-              "Value": 1,
-              "scene_id": 2
+              "job": true
             },
             "renameByName": {
-              "Time": "Last Updated",
-              "Value": "OCount",
-              "__name__": "",
-              "scene_id": "Scene ID",
-              "scene_name": "Title"
+              "Value": "Performers"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "barchart"
     },
     {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 18
+      "description": "Scene-performer pairs by performer age at the scene's date. Bars = count; line = 3-year centered moving average. Missing ages are shown as 0.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlPu"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Scene-performer pairs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trend"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "age"
+            },
+            "properties": [
+              {
+                "id": "min",
+                "value": 17
+              },
+              {
+                "id": "max",
+                "value": 46
+              },
+              {
+                "id": "displayName",
+                "value": "Age"
+              }
+            ]
+          }
+        ]
       },
-      "id": 30,
-      "panels": [
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "continuous-BlPu"
-              },
-              "decimals": 1,
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "h"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 12,
-            "x": 0,
-            "y": 19
-          },
-          "id": 31,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "vertical",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "sizing": "auto",
-            "valueMode": "hidden"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Mon\"} / 3600",
-              "legendFormat": "Mon",
-              "refId": "A"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Tue\"} / 3600",
-              "legendFormat": "Tue",
-              "refId": "B"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Wed\"} / 3600",
-              "legendFormat": "Wed",
-              "refId": "C"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Thu\"} / 3600",
-              "legendFormat": "Thu",
-              "refId": "D"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Fri\"} / 3600",
-              "legendFormat": "Fri",
-              "refId": "E"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Sat\"} / 3600",
-              "legendFormat": "Sat",
-              "refId": "F"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_dow{day_of_week=\"Sun\"} / 3600",
-              "legendFormat": "Sun",
-              "refId": "G"
-            }
-          ],
-          "title": "Watch Time by Day of Week",
-          "type": "bargauge"
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 69,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "continuous-purples"
-              },
-              "decimals": 1,
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "h"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 12,
-            "x": 12,
-            "y": 19
-          },
-          "id": 32,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "vertical",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "sizing": "auto",
-            "valueMode": "hidden"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"0\"} / 3600",
-              "legendFormat": "00",
-              "refId": "A"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"1\"} / 3600",
-              "legendFormat": "01",
-              "refId": "B"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"2\"} / 3600",
-              "legendFormat": "02",
-              "refId": "C"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"3\"} / 3600",
-              "legendFormat": "03",
-              "refId": "D"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"4\"} / 3600",
-              "legendFormat": "04",
-              "refId": "E"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"5\"} / 3600",
-              "legendFormat": "05",
-              "refId": "F"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"6\"} / 3600",
-              "legendFormat": "06",
-              "refId": "G"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"7\"} / 3600",
-              "legendFormat": "07",
-              "refId": "H"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"8\"} / 3600",
-              "legendFormat": "08",
-              "refId": "I"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"9\"} / 3600",
-              "legendFormat": "09",
-              "refId": "J"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"10\"} / 3600",
-              "legendFormat": "10",
-              "refId": "K"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"11\"} / 3600",
-              "legendFormat": "11",
-              "refId": "L"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"12\"} / 3600",
-              "legendFormat": "12",
-              "refId": "M"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"13\"} / 3600",
-              "legendFormat": "13",
-              "refId": "N"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"14\"} / 3600",
-              "legendFormat": "14",
-              "refId": "O"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"15\"} / 3600",
-              "legendFormat": "15",
-              "refId": "P"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"16\"} / 3600",
-              "legendFormat": "16",
-              "refId": "Q"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"17\"} / 3600",
-              "legendFormat": "17",
-              "refId": "R"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"18\"} / 3600",
-              "legendFormat": "18",
-              "refId": "S"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"19\"} / 3600",
-              "legendFormat": "19",
-              "refId": "T"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"20\"} / 3600",
-              "legendFormat": "20",
-              "refId": "U"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"21\"} / 3600",
-              "legendFormat": "21",
-              "refId": "V"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"22\"} / 3600",
-              "legendFormat": "22",
-              "refId": "W"
-            },
-            {
-              "expr": "stash_play_duration_seconds_by_hour{hour_of_day=\"23\"} / 3600",
-              "legendFormat": "23",
-              "refId": "X"
-            }
-          ],
-          "title": "Watch Time by Hour of Day",
-          "type": "bargauge"
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
         },
+        "xField": "age"
+      },
+      "pluginVersion": "13.2.3",
+      "targets": [
         {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "max": 100,
-              "thresholds": {
-                "mode": "percentage",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 5,
-            "w": 24,
-            "x": 0,
-            "y": 58
-          },
-          "id": 47,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "sizing": "auto",
-            "valueMode": "color"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_scenes_organized_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "Organized",
-              "refId": "A"
-            },
-            {
-              "expr": "stash_scenes_with_stashid_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "StashID",
-              "refId": "B"
-            },
-            {
-              "expr": "stash_scenes_tagged_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "Tagged",
-              "refId": "C"
-            },
-            {
-              "expr": "stash_scenes_with_performers_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "Performers",
-              "refId": "D"
-            },
-            {
-              "expr": "stash_scenes_with_studio_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "Studio",
-              "refId": "E"
-            },
-            {
-              "editorMode": "code",
-              "expr": "stash_scenes_with_markers_total / clamp_min(stash_scenes_total, 1) * 100",
-              "legendFormat": "Markers",
-              "range": true,
-              "refId": "F"
-            }
-          ],
-          "title": "Curation coverage",
-          "type": "bargauge"
+          "editorMode": "code",
+          "expr": "max by (age) (stash_scene_performer_age_count) or label_replace(vector(0),\"age\",\"18\",\"\",\"\") or label_replace(vector(0),\"age\",\"19\",\"\",\"\") or label_replace(vector(0),\"age\",\"20\",\"\",\"\") or label_replace(vector(0),\"age\",\"21\",\"\",\"\") or label_replace(vector(0),\"age\",\"22\",\"\",\"\") or label_replace(vector(0),\"age\",\"23\",\"\",\"\") or label_replace(vector(0),\"age\",\"24\",\"\",\"\") or label_replace(vector(0),\"age\",\"25\",\"\",\"\") or label_replace(vector(0),\"age\",\"26\",\"\",\"\") or label_replace(vector(0),\"age\",\"27\",\"\",\"\") or label_replace(vector(0),\"age\",\"28\",\"\",\"\") or label_replace(vector(0),\"age\",\"29\",\"\",\"\") or label_replace(vector(0),\"age\",\"30\",\"\",\"\") or label_replace(vector(0),\"age\",\"31\",\"\",\"\") or label_replace(vector(0),\"age\",\"32\",\"\",\"\") or label_replace(vector(0),\"age\",\"33\",\"\",\"\") or label_replace(vector(0),\"age\",\"34\",\"\",\"\") or label_replace(vector(0),\"age\",\"35\",\"\",\"\") or label_replace(vector(0),\"age\",\"36\",\"\",\"\") or label_replace(vector(0),\"age\",\"37\",\"\",\"\") or label_replace(vector(0),\"age\",\"38\",\"\",\"\") or label_replace(vector(0),\"age\",\"39\",\"\",\"\") or label_replace(vector(0),\"age\",\"40\",\"\",\"\") or label_replace(vector(0),\"age\",\"41\",\"\",\"\") or label_replace(vector(0),\"age\",\"42\",\"\",\"\") or label_replace(vector(0),\"age\",\"43\",\"\",\"\") or label_replace(vector(0),\"age\",\"44\",\"\",\"\") or label_replace(vector(0),\"age\",\"45\",\"\",\"\")",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
         }
       ],
-      "title": "Playtime Patterns",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
-      "id": 40,
-      "panels": [],
-      "title": "Library Curation",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 20
-      },
-      "id": 1,
-      "panels": [
+      "title": "Performer Age in Scene",
+      "transformations": [
         {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 2,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-red",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "bytes"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 0,
-            "y": 21
-          },
-          "id": 9,
+          "id": "convertFieldType",
           "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_files_size_bytes",
-              "refId": "A"
-            }
-          ],
-          "title": "Library Size",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Scenes",
-                  "url": "http://localhost:9999/scenes?sortby=date"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-green",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 4,
-            "y": 21
-          },
-          "id": 2,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_scenes_total",
-              "refId": "A"
-            }
-          ],
-          "title": "Scenes",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Images",
-                  "url": "http://localhost:9999/images?sortby=random_20088047"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-blue",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 8,
-            "y": 21
-          },
-          "id": 71,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_images_total",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Images",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Markers",
-                  "url": "http://localhost:9999/scenes/markers?sortby=title"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "super-light-orange",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 12,
-            "y": 21
-          },
-          "id": 48,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_markers_total",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Markers",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "title": "Show Performers",
-                  "url": "http://localhost:9999/performers?sortby=name"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-purple",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 15,
-            "y": 21
-          },
-          "id": 4,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_performers_total",
-              "refId": "A"
-            }
-          ],
-          "title": "Performers",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Studios",
-                  "url": "http://localhost:9999/studios?sortby=name"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-red",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 18,
-            "y": 21
-          },
-          "id": 5,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_studios_total",
-              "refId": "A"
-            }
-          ],
-          "title": "Studios",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Tags",
-                  "url": "http://localhost:9999/tags?sortby=name"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "light-yellow",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 21,
-            "y": 21
-          },
-          "id": 6,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "expr": "stash_tags_total",
-              "refId": "A"
-            }
-          ],
-          "title": "Tags",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "showValues": false,
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 0,
-            "y": 57
-          },
-          "id": 18,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "exemplar": false,
-              "expr": "stash_scenes_total",
-              "instant": false,
-              "legendFormat": "Scenes total",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "editorMode": "code",
-              "exemplar": false,
-              "expr": "stash_images_total",
-              "instant": false,
-              "legendFormat": "Images total",
-              "range": true,
-              "refId": "B"
-            },
-            {
-              "expr": "stash_total_play_count",
-              "legendFormat": "Total play count",
-              "refId": "C"
-            },
-            {
-              "expr": "stash_total_o_count",
-              "legendFormat": "Total O counter",
-              "refId": "D"
-            }
-          ],
-          "title": "Library Size, Plays & O Counter Over Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "df7cjcbegurr4d"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": true,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "showValues": false,
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "age"
               }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 12,
-            "y": 57
-          },
-          "id": 49,
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
           "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
+            "sort": [
+              {
+                "field": "age"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Trend",
+            "mode": "windowFunctions",
+            "replaceFields": false,
+            "window": {
+              "field": "Value",
+              "reducer": "mean",
+              "windowAlignment": "centered",
+              "windowSize": 3,
+              "windowSizeMode": "fixed"
             }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "floor(delta(stash_scenes_total[1d]))",
-              "legendFormat": "Scenes",
-              "range": true,
-              "refId": "A"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "instance": true,
+              "job": true
             },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
-              },
-              "editorMode": "code",
-              "expr": "floor(delta(stash_performers_total[1d]))",
-              "instant": false,
-              "legendFormat": "Performers",
-              "range": true,
-              "refId": "B"
+            "indexByName": {
+              "Trend": 2,
+              "Value": 1,
+              "age": 0
             },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
-              },
-              "editorMode": "code",
-              "expr": "floor(delta(stash_scene_markers_total[1d]))",
-              "instant": false,
-              "legendFormat": "Markers",
-              "range": true,
-              "refId": "C"
+            "renameByName": {
+              "Value": "Scene-performer pairs"
             }
-          ],
-          "title": "Daily library diffs",
-          "type": "timeseries"
+          }
         }
       ],
-      "title": "Library Overview",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 21
-      },
-      "id": 60,
-      "panels": [
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "links": [
-                {
-                  "title": "Show Performers",
-                  "url": "http://localhost:9999/performers?c=(%22type%22:%22ethnicity%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
-                }
-              ],
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 3,
-            "x": 0,
-            "y": 22
-          },
-          "id": 61,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_ethnicity_count{ethnicity!=\"Unknown\"}",
-              "instant": true,
-              "legendFormat": "{{ethnicity}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Ethnicity",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "links": [
-                {
-                  "title": "Show Performers",
-                  "url": "http://localhost:9999/performers?c=(%22type%22:%22hair_color%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
-                }
-              ],
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 3,
-            "x": 3,
-            "y": 22
-          },
-          "id": 62,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_hair_color_count{hair_color!=\"Unknown\"}",
-              "instant": true,
-              "legendFormat": "{{hair_color}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Hair Color",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "links": [
-                {
-                  "title": "Show Perfomers",
-                  "url": "http://localhost:9999/performers?c=(%22type%22:%22eye_color%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
-                }
-              ],
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 3,
-            "x": 6,
-            "y": 22
-          },
-          "id": 63,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_eye_color_count{eye_color!=\"Unknown\"}",
-              "format": "time_series",
-              "instant": true,
-              "legendFormat": "{{eye_color}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Eye Color",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "links": [
-                {
-                  "title": "Show Performers",
-                  "url": "http://localhost:9999/performers?c=(%22type%22:%22fake_tits%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
-                }
-              ],
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 3,
-            "x": 9,
-            "y": 22
-          },
-          "id": 67,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_fake_tits_count{fake_tits!=\"Unknown\"}",
-              "instant": true,
-              "legendFormat": "{{fake_tits}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Tits",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "links": [],
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 3,
-            "x": 12,
-            "y": 22
-          },
-          "id": 66,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_cup_size_count{cup_size!=\"Unknown\"}",
-              "instant": true,
-              "legendFormat": "{{cup_size}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Cup Size",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "continuous-BlPu"
-              },
-              "decimals": 0,
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 9,
-            "x": 15,
-            "y": 22
-          },
-          "id": 65,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "sizing": "auto",
-            "valueMode": "color"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "sort_desc(stash_performer_height_range_count{height_range!=\"Unknown\"})",
-              "instant": true,
-              "legendFormat": "{{height_range}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Height Distribution",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "purple",
-                "mode": "fixed"
-              },
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Scenes",
-                  "url": "http://localhost:9999/scenes?c=(%22type%22:%22performer_age%22,%22modifier%22:%22EQUALS%22,%22value%22:(%22value%22:${__field.labels.age}))&sortby=date"
-                }
-              ],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 31
-          },
-          "id": 69,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": false,
-            "sizing": "auto",
-            "valueMode": "color"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "exemplar": false,
-              "expr": "sort_desc(stash_scene_performer_age_count)",
-              "format": "time_series",
-              "instant": false,
-              "interval": "",
-              "legendFormat": "{{age}}",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Performer Age in Scene",
-          "transparent": true,
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "continuous-BlPu"
-              },
-              "decimals": 0,
-              "links": [
-                {
-                  "targetBlank": true,
-                  "title": "Show Performers",
-                  "url": "http://localhost:9999/performers?c=(%22type%22:%22country%22,%22modifier%22:%22EQUALS%22,%22value%22:%22${__series.name}%22)&sortby=name"
-                }
-              ],
-              "mappings": [],
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 38
-          },
-          "id": 68,
-          "options": {
-            "displayMode": "gradient",
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "maxVizHeight": 300,
-            "minVizHeight": 16,
-            "minVizWidth": 8,
-            "namePlacement": "auto",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "sizing": "auto",
-            "valueMode": "color"
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "topk(10, stash_performer_country_count{country!=\"Unknown\"})",
-              "instant": true,
-              "legendFormat": "{{country}}",
-              "refId": "A"
-            }
-          ],
-          "title": "Top 10 Countries",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "super-light-yellow",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "series",
-                "axisGridShow": false,
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "links": [],
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 10
-                  },
-                  {
-                    "color": "#6ED0E0",
-                    "value": 20
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 45
-          },
-          "id": 70,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.97,
-            "colorByField": "month",
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "orientation": "auto",
-            "showValue": "never",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "maxWidth": 1,
-              "mode": "none",
-              "sort": "none"
-            },
-            "xField": "month",
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 100
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "exemplar": false,
-              "expr": "sort(stash_scene_production_month_count)",
-              "format": "table",
-              "instant": true,
-              "interval": "",
-              "legendFormat": "{{month}}",
-              "range": false,
-              "refId": "A"
-            }
-          ],
-          "title": "Scene Production Timeline (by Month)",
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "keepLabels": [
-                  "month"
-                ],
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "dateFormat": "YYYY-MM",
-                    "destinationType": "time",
-                    "targetField": "month"
-                  }
-                ],
-                "fields": {}
-              }
-            },
-            {
-              "id": "sortBy",
-              "options": {
-                "fields": {},
-                "sort": [
-                  {
-                    "desc": false,
-                    "field": "month"
-                  }
-                ]
-              }
-            }
-          ],
-          "transparent": true,
-          "type": "barchart"
-        }
-      ],
-      "title": "Performer Demographics",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 22
-      },
-      "id": 80,
-      "panels": [
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 0,
-            "y": 23
-          },
-          "id": 101,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_resolution_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{resolution}}"
-            }
-          ],
-          "title": "Scene Resolution",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 6,
-            "y": 23
-          },
-          "id": 102,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_video_codec_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{codec}}"
-            }
-          ],
-          "title": "Video Codec",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 12,
-            "y": 23
-          },
-          "id": 103,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_audio_codec_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{codec}}"
-            }
-          ],
-          "title": "Audio Codec",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 18,
-            "y": 23
-          },
-          "id": 104,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_duration_bucket_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{bucket}}"
-            }
-          ],
-          "title": "Scene Duration",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 0,
-            "y": 31
-          },
-          "id": 105,
-          "options": {
-            "displayMode": "gradient",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_rating_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{rating}}"
-            }
-          ],
-          "title": "Scene Ratings",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 8,
-            "y": 31
-          },
-          "id": 106,
-          "options": {
-            "displayMode": "gradient",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_rating_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{rating}}"
-            }
-          ],
-          "title": "Performer Ratings",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 16,
-            "y": 31
-          },
-          "id": 107,
-          "options": {
-            "displayLabels": [
-              "name",
-              "percent"
-            ],
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": false,
-              "values": [
-                "value",
-                "percent"
-              ]
-            },
-            "pieType": "pie",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "sort": "desc",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_image_resolution_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{resolution}}"
-            }
-          ],
-          "title": "Image Resolution",
-          "type": "piechart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 0,
-            "y": 38
-          },
-          "id": 108,
-          "options": {
-            "displayMode": "gradient",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performer_scene_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{performer}}"
-            }
-          ],
-          "title": "Top Performers by Scenes",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 38
-          },
-          "id": 109,
-          "options": {
-            "displayMode": "gradient",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_studio_scene_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{studio}}"
-            }
-          ],
-          "title": "Top Studios by Scenes",
-          "type": "bargauge"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 24,
-            "x": 0,
-            "y": 47
-          },
-          "id": 110,
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "orientation": "auto",
-            "xTickLabelRotation": -45,
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            },
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scene_added_month_count",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{month}}",
-              "format": "table"
-            }
-          ],
-          "title": "Scenes Added per Month",
-          "type": "barchart"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 0,
-            "y": 55
-          },
-          "id": 111,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scenes_without_phash_total",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Scenes Without Phash",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 4,
-            "y": 55
-          },
-          "id": 112,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_scenes_unplayed_total",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Unplayed Scenes",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 8,
-            "y": 55
-          },
-          "id": 113,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_tags_unused_total",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Unused Tags",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 12,
-            "y": 55
-          },
-          "id": 114,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performers_without_scenes_total",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Performers Without Scenes",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 16,
-            "y": 55
-          },
-          "id": 115,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_performers_favorite_total",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Favorite Performers",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": [],
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 4,
-            "x": 20,
-            "y": 55
-          },
-          "id": 116,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "(time() - stash_scene_last_played_timestamp_seconds) / 86400",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Days Since Last Play",
-          "type": "stat"
-        }
-      ],
-      "title": "Library Quality & Cleanup",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 23
-      },
-      "id": 81,
-      "panels": [
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": [
-                {
-                  "type": "value",
-                  "options": {
-                    "0": {
-                      "text": "DOWN"
-                    },
-                    "1": {
-                      "text": "OK"
-                    }
-                  }
-                }
-              ]
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 0,
-            "y": 24
-          },
-          "id": 117,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_system_status_ok",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Stash Status",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": [
-                {
-                  "type": "value",
-                  "options": {
-                    "0": {
-                      "text": "No"
-                    },
-                    "1": {
-                      "text": "Yes"
-                    }
-                  }
-                }
-              ]
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 4,
-            "y": 24
-          },
-          "id": 118,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_update_available",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Update Available",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 8,
-            "y": 24
-          },
-          "id": 119,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_database_schema_version",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Schema Version",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": [],
-              "unit": "percentunit"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 4,
-            "x": 12,
-            "y": 24
-          },
-          "id": 120,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            }
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_job_running_progress",
-              "instant": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Running Job Progress",
-          "type": "stat"
-        },
-        {
-          "datasource": "prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "mappings": []
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 8,
-            "x": 16,
-            "y": 24
-          },
-          "id": 121,
-          "options": {
-            "displayMode": "gradient",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true
-          },
-          "pluginVersion": "12.4.0",
-          "targets": [
-            {
-              "editorMode": "code",
-              "expr": "stash_job_queue_length",
-              "instant": true,
-              "refId": "A",
-              "legendFormat": "{{status}}"
-            }
-          ],
-          "title": "Job Queue",
-          "type": "bargauge"
-        }
-      ],
-      "title": "Stash Server",
-      "type": "row"
+      "transparent": true,
+      "type": "trend"
     }
   ],
   "preload": false,
+  "refresh": "",
   "schemaVersion": 42,
-  "tags": [],
+  "tags": [
+    "Stash"
+  ],
   "templating": {
     "list": [
       {
-        "baseFilters": [],
-        "datasource": "prometheus",
-        "filters": [],
+        "allowCustomValue": true,
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "enableGroupBy": false,
+        "hide": 0,
         "name": "Filters",
+        "skipUrlSync": false,
         "type": "adhoc"
       }
     ]
@@ -3659,10 +3138,45 @@
     "from": "now-7d",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
   "timezone": "browser",
   "title": "StashApp Library & Playback Overview",
   "uid": "stashapp-overview",
-  "version": 112,
-  "weekStart": ""
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus scraping stashapp-prometheus-exporter",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "13.2.0"
+    }
+  ]
 }

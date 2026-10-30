@@ -54,7 +54,17 @@ See [METRICS.md](METRICS.md) for the full list of exported metrics.
 
 ## Grafana
 
-A pre-built dashboard is available in `dashboards/stashapp-overview.json`. Import it via Dashboards → Import in Grafana.
+An **opinionated** dashboard is provided in `dashboards/stashapp-overview.json`. It reflects one person's idea of what is worth watching
+in a Stash library, so treat it as a starting point rather than a one-size-fits-all: import it, then move panels around or delete what
+you don't need.
+
+- Sections are ordered by how often they are likely to be checked: **Health**, **Library Overview**, **Engagement & Playback**,
+  **Library Curation**, **Playtime Patterns**, **Scene Quality**, **Performer Demographics**.
+- It is deliberately library-focused: it does not show per-performer favourites or rankings.
+- Import via Dashboards → Import in Grafana and pick your Prometheus data source when asked.
+- The Health tile matches any scrape job named `stash*` (the example `prometheus-example.yml` uses `stash`).
+- Built and used on Grafana 13.2. Use a current exporter release: it relies on the monthly `stash_scene_added_month_count` and
+  `stash_image_added_month_count` metrics.
 
 ## Source
 
