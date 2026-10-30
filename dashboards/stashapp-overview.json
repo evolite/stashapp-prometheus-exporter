@@ -1200,7 +1200,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "stash_total_play_duration_seconds / clamp_max(stash_total_play_count, 1e9)",
+          "expr": "stash_total_play_duration_seconds / clamp_min(stash_total_play_count, 1)",
           "range": true,
           "refId": "A"
         }
@@ -1446,7 +1446,7 @@
       "pluginVersion": "13.2.3",
       "targets": [
         {
-          "expr": "stash_total_play_count / clamp_max(stash_scenes_played_total, 1e9)",
+          "expr": "stash_total_play_count / clamp_min(stash_scenes_played_total, 1)",
           "refId": "A"
         }
       ],
