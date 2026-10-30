@@ -111,6 +111,8 @@ query LibraryExtras {
       organized
       rating100
       o_counter
+      tags { id }
+      performers { id }
       visual_files {
         ... on ImageFile { width height format size }
         ... on VideoFile { width height size }

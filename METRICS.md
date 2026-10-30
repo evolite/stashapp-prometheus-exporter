@@ -111,7 +111,7 @@ Named series are limited to the top 20; zero values are omitted.
 
 ## Images & Galleries
 
-- `stash_images_organized_total`, `stash_images_rated_total`, `stash_images_o_count`
+- `stash_images_organized_total`, `stash_images_rated_total`, `stash_images_tagged_total`, `stash_images_with_performers_total`, `stash_images_o_count`
 - `stash_image_resolution_count{resolution}`, `stash_image_format_count{format}`
 - `stash_galleries_organized_total`, `stash_galleries_empty_total`
 

@@ -667,6 +667,8 @@ class StashCollector:
         fmt = _tally(_normalize_label(f.get("format")).lower() for f in files)
         yield GaugeMetricFamily("stash_images_organized_total", "Number of images marked organized.", value=float(sum(1 for im in images if im.get("organized"))))
         yield GaugeMetricFamily("stash_images_rated_total", "Number of images with a rating.", value=float(sum(1 for im in images if im.get("rating100") is not None)))
+        yield GaugeMetricFamily("stash_images_tagged_total", "Number of images with at least one tag.", value=float(sum(1 for im in images if im.get("tags"))))
+        yield GaugeMetricFamily("stash_images_with_performers_total", "Number of images with at least one performer.", value=float(sum(1 for im in images if im.get("performers"))))
         yield GaugeMetricFamily("stash_images_o_count", "Total o-count across images.", value=float(sum(_safe_int(im.get("o_counter")) for im in images)))
         yield _count_family("stash_image_resolution_count", "Number of images by resolution (short edge).", "resolution", res)
         yield _count_family("stash_image_format_count", "Number of images by file format.", "format", fmt)
