@@ -39,6 +39,9 @@ stash_scrapes_total = Counter(
     "Total number of scrapes attempted.",
     labelnames=("status",),
 )
+# Pre-create both series so rate()/increase() see the first failure
+for _status in ("success", "failure"):
+    stash_scrapes_total.labels(status=_status)
 
 
 LOG = logging.getLogger(__name__)
@@ -46,6 +49,9 @@ LOG = logging.getLogger(__name__)
 IMAGES_REFRESH_SECONDS = 3600
 IMAGES_TIMEOUT_SECONDS = 600
 LATEST_VERSION_REFRESH_SECONDS = 6 * 3600
+LATEST_VERSION_RETRY_SECONDS = 600
+SNAPSHOT_TTL_SECONDS = 30
+_JOB_STATUSES = ("ready", "running", "finished", "stopping", "cancelled", "failed")
 
 _DOW_NAMES: list[str] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -158,7 +164,7 @@ def _rating_bucket(rating100: Any) -> str:
     """Map Stash's 0-100 rating to 1-5 stars."""
     if rating100 is None:
         return "unrated"
-    return str(max(1, min(5, round(_safe_int(rating100) / 20))))
+    return str(max(1, min(5, (_safe_int(rating100) + 10) // 20)))
 
 
 def _duration_bucket(seconds: Any) -> str:
@@ -189,7 +195,11 @@ def _tally(keys: Iterable[str]) -> dict[str, int]:
 def _top_family(name: str, doc: str, label: str, pairs: Iterable[tuple[str, float]]) -> GaugeMetricFamily:
     """Top-N (name, value) pairs with value > 0, to bound label cardinality."""
     m = GaugeMetricFamily(name, doc, labels=[label])
-    for key, v in sorted((p for p in pairs if p[1] > 0), key=lambda x: x[1], reverse=True)[:_TOP_N]:
+    totals: dict[str, float] = {}  # names aren't unique in Stash; duplicate label sets fail the whole scrape
+    for key, v in pairs:
+        if v > 0:
+            totals[key] = totals.get(key, 0) + v
+    for key, v in sorted(totals.items(), key=lambda x: (-x[1], x[0]))[:_TOP_N]:
         m.add_metric([key], v)
     return m
 
@@ -213,26 +223,31 @@ class StashCollector:
     This collector follows Prometheus best practices by:
     - Scraping only when Prometheus requests metrics (synchronous)
     - Using MetricFamily objects for labeled metrics to avoid stale labels
-    - Being stateless except for the slow image list, cached in the background
+    - Caching only what is slow: the image aggregates, the latest version, and a short scrape snapshot
     """
 
     def __init__(self, client: StashClient):
         """Initialize the collector with a Stash client."""
         self.client = client
-        self._images: dict[str, Any] | None = None
+        self._image_families: list[GaugeMetricFamily] = []
+        self._images_ok_at: float | None = None
+        self._lock = threading.Lock()
+        self._snapshot: list[GaugeMetricFamily] = []
+        self._snapshot_at = float("-inf")
         self._images_attempt = float("-inf")
         self._images_lock = threading.Lock()
         self._latest_version = ""
-        self._latest_attempt = float("-inf")
+        self._latest_next = float("-inf")
 
     def _get_latest_version(self) -> str:
         # Cached: Stash asks GitHub on each call. "" = unknown (lookup failed, keep last good).
         now = time.monotonic()
-        if now - self._latest_attempt >= LATEST_VERSION_REFRESH_SECONDS:
-            self._latest_attempt = now
+        if now >= self._latest_next:
+            self._latest_next = now + LATEST_VERSION_RETRY_SECONDS
             try:
                 data = self.client.run_query(LATEST_VERSION_QUERY)
                 self._latest_version = (data.get("latestversion") or {}).get("version") or self._latest_version
+                self._latest_next = now + LATEST_VERSION_REFRESH_SECONDS
             except Exception:
                 LOG.warning("Failed to fetch latest Stash version", exc_info=True)
         return self._latest_version
@@ -240,7 +255,10 @@ class StashCollector:
     def _refresh_images(self) -> None:
         # Slow (Stash has no image index): runs in a thread, keeps stale data on failure.
         try:
-            self._images = self.client.run_query(LIBRARY_IMAGES_QUERY, timeout=IMAGES_TIMEOUT_SECONDS)
+            data = self.client.run_query(LIBRARY_IMAGES_QUERY, timeout=IMAGES_TIMEOUT_SECONDS)
+            # Keep only the aggregates, not the raw (potentially huge) image list
+            self._image_families = list(self._collect_image_metrics(data))
+            self._images_ok_at = time.time()
         except Exception:
             LOG.exception("Failed to fetch images")
         finally:
@@ -256,65 +274,60 @@ class StashCollector:
     def collect(self) -> Iterable[GaugeMetricFamily]:
         """Collect metrics from Stash. Called by Prometheus on each scrape.
 
-        This method is called synchronously when Prometheus requests /metrics.
-        All data is fetched fresh from Stash - no caching or state is maintained.
+        Scrapes are serialised and a successful result is reused for
+        SNAPSHOT_TTL_SECONDS, so overlapping scrapes don't multiply load on Stash.
         """
-        scrape_start = time.monotonic()
-        scrape_success = False
+        with self._lock:
+            if time.monotonic() - self._snapshot_at >= SNAPSHOT_TTL_SECONDS:
+                start = time.monotonic()
+                try:
+                    self._snapshot = self._build(start)
+                    self._snapshot_at = time.monotonic()
+                    stash_scrapes_total.labels(status="success").inc()
+                except Exception:
+                    LOG.exception("Failed to scrape Stash")
+                    stash_scrapes_total.labels(status="failure").inc()
+                    return list(self._collect_exporter_health_metrics(False, time.monotonic() - start))
+            return list(self._snapshot)
 
+    def _build(self, start: float) -> list[GaugeMetricFamily]:
+        """Fetch from Stash and build every family up front, so output is all-or-nothing."""
+        stats = self.client.run_query(LIBRARY_STATS_QUERY).get("stats") or {}
+        scenes = (self.client.run_query(SCENE_PLAY_HISTORY_QUERY).get("findScenes") or {}).get("scenes") or []
+        performers = (self.client.run_query(PERFORMER_ATTRIBUTES_QUERY).get("findPerformers") or {}).get("performers") or []
+
+        # Extras are best-effort: never fail the core scrape over them
         try:
-            # Fetch library stats
-            stats_data: dict[str, Any] = self.client.run_query(LIBRARY_STATS_QUERY)
-            stats = stats_data.get("stats") or {}
-
-            # Fetch scene data for detailed metrics
-            scenes_data: dict[str, Any] = self.client.run_query(SCENE_PLAY_HISTORY_QUERY)
-            scenes_root = scenes_data.get("findScenes") or {}
-            scenes = scenes_root.get("scenes") or []
-
-            # Fetch performer data for demographic metrics
-            performer_data: dict[str, Any] = self.client.run_query(PERFORMER_ATTRIBUTES_QUERY)
-            performers_root = performer_data.get("findPerformers") or {}
-            performers = performers_root.get("performers") or []
-
-            # Extras are best-effort: never fail the core scrape over them
-            try:
-                extras: dict[str, Any] = self.client.run_query(LIBRARY_EXTRAS_QUERY)
-            except Exception:
-                LOG.exception("Failed to fetch library extras")
-                extras = {}
-            extras_ok = bool(extras)
-            self._maybe_refresh_images()
-            if extras and self._images:
-                extras.update(self._images)
-
-            scrape_success = True
-
-            # Yield all metrics
-            yield from self._collect_library_metrics(stats)
-            yield from self._collect_playtime_metrics(scenes)
-            yield from self._collect_metadata_metrics(scenes)
-            yield from self._collect_tag_usage_metrics(scenes)
-            yield from self._collect_top_rated_tag_usage_metrics(scenes)
-            yield from self._collect_orgasm_metrics(scenes)
-            yield from self._collect_performer_attribute_metrics(performers)
-            yield from self._collect_scene_performer_age_metrics(scenes)
-            yield from self._collect_scene_production_timeline_metrics(scenes)
-            yield from self._collect_scene_file_metrics(scenes)
-            yield from self._collect_scene_engagement_metrics(scenes)
-            yield from self._collect_performer_engagement_metrics(performers)
-            yield GaugeMetricFamily("stash_extras_up", "1 if the library extras query succeeded on the last scrape, else 0.", value=float(extras_ok))
-            if extras:
-                yield from self._collect_extras_metrics(extras)
-            yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
-
-            # Increment scrape counter (persists across scrapes)
-            stash_scrapes_total.labels(status="success").inc()
-
+            extras: dict[str, Any] = self.client.run_query(LIBRARY_EXTRAS_QUERY)
         except Exception:
-            LOG.exception("Failed to scrape Stash")
-            yield from self._collect_exporter_health_metrics(False, time.monotonic() - scrape_start)
-            stash_scrapes_total.labels(status="failure").inc()
+            LOG.exception("Failed to fetch library extras")
+            extras = {}
+        self._maybe_refresh_images()
+
+        out: list[GaugeMetricFamily] = []
+        for part in (
+            self._collect_library_metrics(stats),
+            self._collect_playtime_metrics(scenes),
+            self._collect_metadata_metrics(scenes),
+            self._collect_tag_usage_metrics(scenes),
+            self._collect_top_rated_tag_usage_metrics(scenes),
+            self._collect_orgasm_metrics(scenes),
+            self._collect_performer_attribute_metrics(performers),
+            self._collect_scene_performer_age_metrics(scenes),
+            self._collect_scene_production_timeline_metrics(scenes),
+            self._collect_scene_file_metrics(scenes),
+            self._collect_scene_engagement_metrics(scenes),
+            self._collect_performer_engagement_metrics(performers),
+            self._collect_extras_metrics(extras) if extras else (),
+        ):
+            out.extend(part)
+        out.append(GaugeMetricFamily("stash_extras_up", "1 if the library extras query succeeded on the last scrape, else 0.", value=float(bool(extras))))
+        # Image aggregates are cached for up to an hour; independent of the extras query
+        out.extend(self._image_families)
+        if self._images_ok_at is not None:
+            out.append(GaugeMetricFamily("stash_images_last_refresh_timestamp_seconds", "Unix time of the last successful image listing.", value=self._images_ok_at))
+        out.extend(self._collect_exporter_health_metrics(True, time.monotonic() - start))
+        return out
 
     def _collect_library_metrics(self, stats: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         """Collect library-wide aggregate metrics from stats query."""
@@ -413,7 +426,7 @@ class StashCollector:
                     tag_usage_counts[tag_name] = tag_usage_counts.get(tag_name, 0) + 1
 
         # Sort by count (descending) and take top 100 to limit label cardinality
-        sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: x[1], reverse=True)
+        sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: (-x[1], x[0]))
         top_tags = sorted_tags[:100]
 
         # Create metric with only current top 100 tags (stale tags automatically cleared)
@@ -451,7 +464,7 @@ class StashCollector:
                     tag_usage_counts[tag_name] = tag_usage_counts.get(tag_name, 0) + 1
 
         # Sort by count (descending) and take top 100 to limit label cardinality
-        sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: x[1], reverse=True)
+        sorted_tags = sorted(tag_usage_counts.items(), key=lambda x: (-x[1], x[0]))
         top_tags = sorted_tags[:100]
 
         # Create metric with only current top 100 tags (stale tags automatically cleared)
@@ -701,8 +714,6 @@ class StashCollector:
 
     def _collect_extras_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         """Images, galleries, studios, tags, job queue and system/version info."""
-        if "findImages" in extras:  # absent until the first background fetch finishes
-            yield from self._collect_image_metrics(extras)
         yield from self._collect_catalog_metrics(extras)
         yield from self._collect_server_metrics(extras)
 
@@ -735,7 +746,7 @@ class StashCollector:
 
     def _collect_server_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         jobs = extras.get("jobQueue") or []
-        by_status = _tally(_normalize_label(j.get("status")).lower() for j in jobs)
+        by_status = {**dict.fromkeys(_JOB_STATUSES, 0), **_tally(_normalize_label(j.get("status")).lower() for j in jobs)}
         yield _count_family("stash_job_queue_length", "Number of jobs in the Stash queue by status.", "status", by_status)
         running = [float(j.get("progress") or 0.0) for j in jobs if str(j.get("status")).upper() == "RUNNING"]
         yield GaugeMetricFamily("stash_job_running_progress", "Progress (0-1) of the first running job, -1 if none.", value=running[0] if running else -1.0)

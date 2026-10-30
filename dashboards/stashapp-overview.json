@@ -360,7 +360,7 @@
       "pluginVersion": "12.4.0",
       "targets": [
         {
-          "expr": "stash_total_play_count / clamp_max(stash_scenes_played_total, 1e9)",
+          "expr": "stash_total_play_count / clamp_min(stash_scenes_played_total, 1)",
           "refId": "A"
         }
       ],
@@ -454,7 +454,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "increase(stash_total_play_duration_seconds[1d])",
+          "expr": "clamp_min(delta(stash_total_play_duration_seconds[1d]), 0)",
           "legendFormat": "playtime",
           "range": true,
           "refId": "A"
@@ -517,7 +517,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "stash_total_play_duration_seconds / clamp_max(stash_total_play_count, 1e9)",
+          "expr": "stash_total_play_duration_seconds / clamp_min(stash_total_play_count, 1)",
           "range": true,
           "refId": "A"
         }
@@ -1165,33 +1165,33 @@
           "pluginVersion": "12.4.0",
           "targets": [
             {
-              "expr": "stash_scenes_organized_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_organized_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "Organized",
               "refId": "A"
             },
             {
-              "expr": "stash_scenes_with_stashid_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_with_stashid_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "StashID",
               "refId": "B"
             },
             {
-              "expr": "stash_scenes_tagged_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_tagged_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "Tagged",
               "refId": "C"
             },
             {
-              "expr": "stash_scenes_with_performers_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_with_performers_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "Performers",
               "refId": "D"
             },
             {
-              "expr": "stash_scenes_with_studio_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_with_studio_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "Studio",
               "refId": "E"
             },
             {
               "editorMode": "code",
-              "expr": "stash_scenes_with_markers_total / stash_scenes_total * 100",
+              "expr": "stash_scenes_with_markers_total / clamp_min(stash_scenes_total, 1) * 100",
               "legendFormat": "Markers",
               "range": true,
               "refId": "F"

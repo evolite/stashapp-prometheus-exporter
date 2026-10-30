@@ -111,6 +111,8 @@ Named series are limited to the top 20; zero values are omitted.
 
 ## Images & Galleries
 
+- `stash_images_last_refresh_timestamp_seconds` - Unix time of the last successful image listing (absent until the first one)
+
 Image metrics come from a full image listing (slow: Stash doesn't index images). It runs in the background, refreshes hourly, and the metrics are absent until the first fetch completes.
 
 - `stash_extras_up` - 1 if the extras query (everything below, plus studios/tags/server info) succeeded; 0 means those metrics are being dropped
@@ -131,3 +133,5 @@ Image metrics come from a full image listing (slow: Stash doesn't index images).
 - `stash_up` - 1 if the last scrape succeeded, 0 otherwise
 - `stash_scrape_duration_seconds` - Time spent on the last scrape
 - `stash_scrapes_total{status="success|failure"}` - Total scrape attempts
+
+Scrapes are serialised and a successful result is reused for 30 s. Performer/studio top-N series with the same name are summed.
