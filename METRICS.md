@@ -124,7 +124,7 @@ Image metrics come from a full image listing (slow: Stash doesn't index images).
 - `stash_job_queue_length{status}` - jobs by status (`running`, `ready`, ...)
 - `stash_job_running_progress` - 0-1 progress of the running job, `-1` when idle
 - `stash_system_status_ok`, `stash_database_schema_version`
-- `stash_info{version}` - always 1; `stash_update_available` - 1 when a newer release exists
+- `stash_info{version}` - always 1; `stash_update_available` - 1 when a newer release exists (checked every 6 h; absent while the GitHub lookup fails)
 
 ## Exporter Health
 

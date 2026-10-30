@@ -22,6 +22,7 @@ from prometheus_client import Counter
 from prometheus_client.core import GaugeMetricFamily
 
 from .queries import (
+    LATEST_VERSION_QUERY,
     LIBRARY_IMAGES_QUERY,
     LIBRARY_EXTRAS_QUERY,
     LIBRARY_STATS_QUERY,
@@ -44,6 +45,7 @@ LOG = logging.getLogger(__name__)
 
 IMAGES_REFRESH_SECONDS = 3600
 IMAGES_TIMEOUT_SECONDS = 600
+LATEST_VERSION_REFRESH_SECONDS = 6 * 3600
 
 _DOW_NAMES: list[str] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -220,6 +222,20 @@ class StashCollector:
         self._images: dict[str, Any] | None = None
         self._images_attempt = float("-inf")
         self._images_lock = threading.Lock()
+        self._latest_version = ""
+        self._latest_attempt = float("-inf")
+
+    def _get_latest_version(self) -> str:
+        # Cached: Stash asks GitHub on each call. "" = unknown (lookup failed, keep last good).
+        now = time.monotonic()
+        if now - self._latest_attempt >= LATEST_VERSION_REFRESH_SECONDS:
+            self._latest_attempt = now
+            try:
+                data = self.client.run_query(LATEST_VERSION_QUERY)
+                self._latest_version = (data.get("latestversion") or {}).get("version") or self._latest_version
+            except Exception:
+                LOG.warning("Failed to fetch latest Stash version", exc_info=True)
+        return self._latest_version
 
     def _refresh_images(self) -> None:
         # Slow (Stash has no image index): runs in a thread, keeps stale data on failure.
@@ -728,11 +744,12 @@ class StashCollector:
         yield GaugeMetricFamily("stash_system_status_ok", "1 if Stash systemStatus is OK.", value=1.0 if sysstat.get("status") == "OK" else 0.0)
         yield GaugeMetricFamily("stash_database_schema_version", "Stash database schema version.", value=float(_safe_int(sysstat.get("databaseSchema"))))
         current = (extras.get("version") or {}).get("version") or ""
-        latest = (extras.get("latestversion") or {}).get("version") or ""
+        latest = self._get_latest_version()
         info = GaugeMetricFamily("stash_info", "Stash version info.", labels=["version"])
         info.add_metric([current or "unknown"], 1.0)
         yield info
-        yield GaugeMetricFamily("stash_update_available", "1 if a newer Stash release exists.", value=1.0 if current and latest and current != latest else 0.0)
+        if current and latest:  # omitted (unknown) while the GitHub lookup is failing
+            yield GaugeMetricFamily("stash_update_available", "1 if a newer Stash release exists.", value=1.0 if current != latest else 0.0)
 
     def _collect_exporter_health_metrics(self, success: bool, duration: float) -> Iterable[GaugeMetricFamily]:
         """Collect exporter health and performance metrics."""

@@ -118,7 +118,6 @@ query LibraryExtras {
   jobQueue { status progress }
   systemStatus { status databaseSchema }
   version { version }
-  latestversion { version }
 }
 """
 
@@ -142,8 +141,17 @@ query LibraryImages {
 }
 """
 
+# Stash looks this up on GitHub and returns data: null for the whole query if
+# that fails (e.g. 403 rate limit), so it must never share a query.
+LATEST_VERSION_QUERY: str = """
+query LatestVersion {
+  latestversion { version }
+}
+"""
+
 
 __all__ = [
+    "LATEST_VERSION_QUERY",
     "LIBRARY_EXTRAS_QUERY",
     "LIBRARY_IMAGES_QUERY",
     "LIBRARY_STATS_QUERY",
