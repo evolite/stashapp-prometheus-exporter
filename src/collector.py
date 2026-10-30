@@ -172,6 +172,13 @@ def _count_family(name: str, doc: str, label: str, counts: dict[str, int]) -> Ga
     return m
 
 
+def _tally(keys: Iterable[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for k in keys:
+        counts[k] = counts.get(k, 0) + 1
+    return counts
+
+
 def _top_family(name: str, doc: str, label: str, pairs: Iterable[tuple[str, float]]) -> GaugeMetricFamily:
     """Top-N (name, value) pairs with value > 0, to bound label cardinality."""
     m = GaugeMetricFamily(name, doc, labels=[label])
@@ -649,21 +656,22 @@ class StashCollector:
 
     def _collect_extras_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         """Images, galleries, studios, tags, job queue and system/version info."""
+        yield from self._collect_image_metrics(extras)
+        yield from self._collect_catalog_metrics(extras)
+        yield from self._collect_server_metrics(extras)
+
+    def _collect_image_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         images = (extras.get("findImages") or {}).get("images") or []
-        res: dict[str, int] = {}
-        fmt: dict[str, int] = {}
-        for im in images:
-            vf = (im.get("visual_files") or [{}])[0]
-            k = _resolution_bucket(vf.get("width"), vf.get("height"))
-            res[k] = res.get(k, 0) + 1
-            k = _normalize_label(vf.get("format")).lower()
-            fmt[k] = fmt.get(k, 0) + 1
+        files = [(im.get("visual_files") or [{}])[0] for im in images]
+        res = _tally(_resolution_bucket(f.get("width"), f.get("height")) for f in files)
+        fmt = _tally(_normalize_label(f.get("format")).lower() for f in files)
         yield GaugeMetricFamily("stash_images_organized_total", "Number of images marked organized.", value=float(sum(1 for im in images if im.get("organized"))))
         yield GaugeMetricFamily("stash_images_rated_total", "Number of images with a rating.", value=float(sum(1 for im in images if im.get("rating100") is not None)))
         yield GaugeMetricFamily("stash_images_o_count", "Total o-count across images.", value=float(sum(_safe_int(im.get("o_counter")) for im in images)))
         yield _count_family("stash_image_resolution_count", "Number of images by resolution (short edge).", "resolution", res)
         yield _count_family("stash_image_format_count", "Number of images by file format.", "format", fmt)
 
+    def _collect_catalog_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         galleries = (extras.get("findGalleries") or {}).get("galleries") or []
         yield GaugeMetricFamily("stash_galleries_organized_total", "Number of galleries marked organized.", value=float(sum(1 for g in galleries if g.get("organized"))))
         yield GaugeMetricFamily("stash_galleries_empty_total", "Number of galleries with no images.", value=float(sum(1 for g in galleries if _safe_int(g.get("image_count")) == 0)))
@@ -677,11 +685,9 @@ class StashCollector:
         unused = sum(1 for t in tags if not (_safe_int(t.get("scene_count")) or _safe_int(t.get("image_count")) or _safe_int(t.get("performer_count"))))
         yield GaugeMetricFamily("stash_tags_unused_total", "Number of tags not applied to any scene, image or performer.", value=float(unused))
 
+    def _collect_server_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         jobs = extras.get("jobQueue") or []
-        by_status: dict[str, int] = {}
-        for j in jobs:
-            k = _normalize_label(j.get("status")).lower()
-            by_status[k] = by_status.get(k, 0) + 1
+        by_status = _tally(_normalize_label(j.get("status")).lower() for j in jobs)
         yield _count_family("stash_job_queue_length", "Number of jobs in the Stash queue by status.", "status", by_status)
         running = [float(j.get("progress") or 0.0) for j in jobs if str(j.get("status")).upper() == "RUNNING"]
         yield GaugeMetricFamily("stash_job_running_progress", "Progress (0-1) of the first running job, -1 if none.", value=running[0] if running else -1.0)
