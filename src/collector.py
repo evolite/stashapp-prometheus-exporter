@@ -243,6 +243,7 @@ class StashCollector:
             except Exception:
                 LOG.exception("Failed to fetch library extras")
                 extras = {}
+            extras_ok = bool(extras)
 
             scrape_success = True
 
@@ -259,6 +260,7 @@ class StashCollector:
             yield from self._collect_scene_file_metrics(scenes)
             yield from self._collect_scene_engagement_metrics(scenes)
             yield from self._collect_performer_engagement_metrics(performers)
+            yield GaugeMetricFamily("stash_extras_up", "1 if the library extras query succeeded on the last scrape, else 0.", value=float(extras_ok))
             if extras:
                 yield from self._collect_extras_metrics(extras)
             yield from self._collect_exporter_health_metrics(scrape_success, time.monotonic() - scrape_start)
