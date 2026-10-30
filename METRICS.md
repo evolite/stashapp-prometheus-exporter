@@ -111,6 +111,8 @@ Named series are limited to the top 20; zero values are omitted.
 
 ## Images & Galleries
 
+Image metrics come from a full image listing (slow: Stash doesn't index images). It runs in the background, refreshes hourly, and the metrics are absent until the first fetch completes.
+
 - `stash_extras_up` - 1 if the extras query (everything below, plus studios/tags/server info) succeeded; 0 means those metrics are being dropped
 
 - `stash_images_organized_total`, `stash_images_rated_total`, `stash_images_tagged_total`, `stash_images_with_performers_total`, `stash_images_o_count`

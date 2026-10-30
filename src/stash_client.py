@@ -29,7 +29,10 @@ class StashClient:
     timeout_seconds: int = 10
 
     def run_query(
-        self, query: str, variables: dict[str, Any] | None = None
+        self,
+        query: str,
+        variables: dict[str, Any] | None = None,
+        timeout: int | None = None,
     ) -> dict[str, Any]:
         """Execute a GraphQL query and return the `data` dictionary.
 
@@ -50,7 +53,7 @@ class StashClient:
                 self.base_url,
                 json=payload,
                 headers=headers,
-                timeout=self.timeout_seconds,
+                timeout=timeout or self.timeout_seconds,
             )
         except requests.RequestException as exc:
             raise StashClientError(

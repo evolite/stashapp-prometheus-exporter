@@ -102,23 +102,10 @@ query PerformerAttributes {
 """
 
 
-# Images, galleries, studios, tags and operational state. Fetched separately so
+# Galleries, studios, tags and operational state. Fetched separately so
 # a failure here never takes down the core metrics.
 LIBRARY_EXTRAS_QUERY: str = """
 query LibraryExtras {
-  findImages(filter: { per_page: -1 }) {
-    images {
-      organized
-      rating100
-      o_counter
-      tags { id }
-      performers { id }
-      visual_files {
-        ... on ImageFile { width height format size }
-        ... on VideoFile { width height size }
-      }
-    }
-  }
   findGalleries(filter: { per_page: -1 }) {
     galleries { organized image_count }
   }
@@ -135,9 +122,30 @@ query LibraryExtras {
 }
 """
 
+# Stash doesn't index images, so listing them all is slow. The collector
+# fetches this in the background and caches it, never inline in a scrape.
+LIBRARY_IMAGES_QUERY: str = """
+query LibraryImages {
+  findImages(filter: { per_page: -1 }) {
+    images {
+      organized
+      rating100
+      o_counter
+      tags { id }
+      performers { id }
+      visual_files {
+        ... on ImageFile { width height format size }
+        ... on VideoFile { width height size }
+      }
+    }
+  }
+}
+"""
+
 
 __all__ = [
     "LIBRARY_EXTRAS_QUERY",
+    "LIBRARY_IMAGES_QUERY",
     "LIBRARY_STATS_QUERY",
     "PERFORMER_ATTRIBUTES_QUERY",
     "SCENE_PLAY_HISTORY_QUERY",

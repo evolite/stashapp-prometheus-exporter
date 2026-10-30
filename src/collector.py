@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
 import time
 from collections.abc import Iterable
 from datetime import date, datetime
@@ -21,6 +22,7 @@ from prometheus_client import Counter
 from prometheus_client.core import GaugeMetricFamily
 
 from .queries import (
+    LIBRARY_IMAGES_QUERY,
     LIBRARY_EXTRAS_QUERY,
     LIBRARY_STATS_QUERY,
     PERFORMER_ATTRIBUTES_QUERY,
@@ -39,6 +41,9 @@ stash_scrapes_total = Counter(
 
 
 LOG = logging.getLogger(__name__)
+
+IMAGES_REFRESH_SECONDS = 3600
+IMAGES_TIMEOUT_SECONDS = 600
 
 _DOW_NAMES: list[str] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -206,12 +211,31 @@ class StashCollector:
     This collector follows Prometheus best practices by:
     - Scraping only when Prometheus requests metrics (synchronous)
     - Using MetricFamily objects for labeled metrics to avoid stale labels
-    - Being fully stateless (no cached data between scrapes)
+    - Being stateless except for the slow image list, cached in the background
     """
 
     def __init__(self, client: StashClient):
         """Initialize the collector with a Stash client."""
         self.client = client
+        self._images: dict[str, Any] | None = None
+        self._images_attempt = float("-inf")
+        self._images_lock = threading.Lock()
+
+    def _refresh_images(self) -> None:
+        # Slow (Stash has no image index): runs in a thread, keeps stale data on failure.
+        try:
+            self._images = self.client.run_query(LIBRARY_IMAGES_QUERY, timeout=IMAGES_TIMEOUT_SECONDS)
+        except Exception:
+            LOG.exception("Failed to fetch images")
+        finally:
+            self._images_lock.release()
+
+    def _maybe_refresh_images(self) -> None:
+        now = time.monotonic()
+        if now - self._images_attempt < IMAGES_REFRESH_SECONDS or not self._images_lock.acquire(blocking=False):
+            return
+        self._images_attempt = now
+        threading.Thread(target=self._refresh_images, daemon=True).start()
 
     def collect(self) -> Iterable[GaugeMetricFamily]:
         """Collect metrics from Stash. Called by Prometheus on each scrape.
@@ -244,6 +268,9 @@ class StashCollector:
                 LOG.exception("Failed to fetch library extras")
                 extras = {}
             extras_ok = bool(extras)
+            self._maybe_refresh_images()
+            if extras and self._images:
+                extras.update(self._images)
 
             scrape_success = True
 
@@ -658,7 +685,8 @@ class StashCollector:
 
     def _collect_extras_metrics(self, extras: dict[str, Any]) -> Iterable[GaugeMetricFamily]:
         """Images, galleries, studios, tags, job queue and system/version info."""
-        yield from self._collect_image_metrics(extras)
+        if "findImages" in extras:  # absent until the first background fetch finishes
+            yield from self._collect_image_metrics(extras)
         yield from self._collect_catalog_metrics(extras)
         yield from self._collect_server_metrics(extras)
 
